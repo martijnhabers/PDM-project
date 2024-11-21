@@ -97,14 +97,21 @@ def is_valid_position(x, y, size, placed_objects):
 
 
 def generate_world_file_content(obstacles):
-    """Generate the XML content for the world file."""
+    """Generate the XML content for the world file, including a ground plane."""
+    ground_plane = """
+        <include>
+            <uri>model://ground_plane</uri>
+        </include>
+    """
     return f"""
     <sdf version="1.6">
         <world name="default">
+            {ground_plane}
             {"".join(obstacles)}
         </world>
     </sdf>
     """
+
 
 
 # Parameters for the world
