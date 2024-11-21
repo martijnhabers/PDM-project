@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>world_creator</name>
+  <version>0.0.0</version>
+  <description>script to create Gazebo world with randomly placed/sized objects</description>
+  <maintainer email="C.J.deDood@student.tudelft.nl">cdedood</maintainer>
+  <license>Apache-2.0</license>
+
+  <exec_depend>math</exec_depend>
+  <exec_depend>random<\exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
