@@ -8,12 +8,19 @@
   <license>Apache-2.0</license>
 
   <exec_depend>math</exec_depend>
-  <exec_depend>random<\exec_depend>
+  
+  <depend>rclpy</depend>
+  <build_depend>drone_msgs</build_depend>  <!-- For Pose3D message -->
+  <exec_depend>python3-numpy</exec_depend> <!-- For numpy -->
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
+  
+    <!-- Optional: Declare the ROS 2 launch system dependencies -->
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
 
   <export>
     <build_type>ament_python</build_type>

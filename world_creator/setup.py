@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-	'creator = creator.generate_world:main'
+            'creator = world_creator.creator:main',  # Adjusted for creator.py
+            'trajectory_builder = world_creator.line_creator:main',  # Adjusted for line_creator.py
         ],
     },
 )
