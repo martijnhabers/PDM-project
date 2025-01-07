@@ -4,12 +4,14 @@ from geometry_msgs.msg import Pose
 import yaml
 import networkx as nx
 from prm_navigation.prm import PRM
+from ament_index_python.packages import get_package_share_directory
 
 class PRMNode(Node):
     def __init__(self):
         super().__init__('prm_node')
-        self.declare_parameter('roadmap_file', 'prm_roadmap.yaml')
+        self.declare_parameter('roadmap_file', 'graph.txt')
         roadmap_file = self.get_parameter('roadmap_file').get_parameter_value().string_value
+        roadmap_file = get_package_share_directory('prm_navigation') + roadmap_file
 
         # Load the roadmap
         self.roadmap = nx.read_weighted_edgelist(roadmap_file, nodetype=int)
