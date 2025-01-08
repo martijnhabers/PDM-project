@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import os
 
 # set random seeds for reproducibility
-# random.seed(0)
-# np.random.seed(0)
+random.seed(0)
+np.random.seed(0)
 
 class PRM:
     def __init__(self, num_samples, k_neighbors, occupancy_grid):
@@ -49,7 +49,7 @@ class PRM:
             node_coords = self.graph.nodes[node]['pos']
             possible_neighbour_coords = self.graph.nodes[possible_neighbour[1]]['pos']
             if self.collision_checker(self.occupancy_grid, node_coords, possible_neighbour_coords):
-                self.graph.add_edge(node, possible_neighbour[1], weight=possible_neighbour[0])
+                self.graph.add_edge(node, possible_neighbour[1], weight=float(possible_neighbour[0]))
     
 
     def find_path(self, start, goal):
@@ -89,6 +89,8 @@ class PRM:
     def export_to_file(self, filename):
         # Export graph to file
         nx.write_weighted_edgelist(self.graph, filename)
+        # nx.write_gexf(self.graph, "graph.gexf")
+        nx.write_gml(self.graph, "graph.gml")
         
 
 
@@ -128,21 +130,44 @@ def plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path=None):
 if __name__ == '__main__':
     print(os.getcwd())
     # Bounds of the environment
-    bounds = [(0, 1000), (0, 1000)]
+    bounds = [(0, 200), (0, 200)]
 
     # Start and goal points
-    start_point = (10, 550)
-    goal_point = (950, 500)
+    start_point = (20, 20)
+    goal_point = (160, 160)
 
     # Generate random grid with obstacles
     grid = generate_dummy_grid(bounds)
 
-    # Create PRM object
-    prm = PRM(num_samples=250, k_neighbors=15, occupancy_grid=grid)
-    prm.build_roadmap(bounds)
+    # print current working directory
+    print(os.getcwd())
 
+    # import grid from csv file
+    grid = np.loadtxt('src/prm_navigation/prm_navigation/word_matrix.csv', delimiter=',')
+    # invert the grid, 0 becomes 1, 1 becomes 0
+    # grid = np.abs(grid - 1)
+
+    # Create PRM object
+    prm = PRM(num_samples=400, k_neighbors=15, occupancy_grid=grid)
+    prm.build_roadmap(bounds)
+    
     prm.export_to_file("graph.txt")
 
     # Uncomment to visualize the PRM
-    # shortest_path = prm.find_path(start_point, goal_point)
-    # plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path)
+    shortest_path = prm.find_path(start_point, goal_point)
+
+    # # save shortest path to csv file, with x and y coordinates
+    # shortest_path_coords = [prm.graph.nodes[node]['pos'] for node in shortest_path]
+    # # convert list of tuple to numpy array
+    # shortest_path_coords = np.array(shortest_path_coords)
+    # shortest_path_coords = shortest_path_coords / 10 - 10
+    # np.savetxt('shortest_path.csv', shortest_path_coords, delimiter=',')
+
+    # # Save as a list of dictionaries, with x and y coordinates and z fixed at 2.0
+    # shortest_path_coords = [{'x': float(coord[0]), 'y': float(coord[1]), 'z': 2.0} for coord in shortest_path_coords]
+    # # save as it would be python code, add indentation as well
+    # with open('shortest_path.py', 'w') as f:
+    #     f.write(str(shortest_path_coords))
+
+
+    plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path)
