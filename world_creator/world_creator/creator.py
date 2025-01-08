@@ -1,5 +1,24 @@
+#!/usr/bin/env python3
 import random
 import math
+from ament_index_python.packages import get_package_share_directory
+import os
+
+def main():
+    try:
+        world_file = os.path.join(
+            get_package_share_directory("sjtu_drone_description"),
+            "worlds", "filled_world.world"
+        )
+
+        generate_world(
+            max_objects=100,       # Max number of objects to try and place
+            area_size=10,          # Size of the placement area (-10 to 10)
+            world_file=world_file
+        )
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
 
 def generate_world(max_objects, area_size, world_file):
     """Generate a Gazebo world with randomly placed objects."""
@@ -39,6 +58,7 @@ def generate_obstacle(name, x, y, size, shape, height):
     if shape == "box":
         return f"""
         <model name="{name}">
+            <static>true</static>  <!-- Make the object static -->
             <pose>{x} {y} {height / 2} 0 0 0</pose>
             <link name="link">
                 <collision name="collision">
@@ -61,6 +81,7 @@ def generate_obstacle(name, x, y, size, shape, height):
     elif shape == "cylinder":
         return f"""
         <model name="{name}">
+            <static>true</static>  <!-- Make the object static -->
             <pose>{x} {y} {height / 2} 0 0 0</pose>
             <link name="link">
                 <collision name="collision">
@@ -85,6 +106,7 @@ def generate_obstacle(name, x, y, size, shape, height):
     else:
         print(f"Error: Unknown shape '{shape}'.")
         return ""
+
 
 
 def is_valid_position(x, y, size, placed_objects):
@@ -116,12 +138,5 @@ def generate_world_file_content(obstacles):
 
 # Parameters for the world
 if __name__ == "__main__":
-    try:
-        generate_world(
-            max_objects=100,       # Max number of objects to try and place
-            area_size=10,          # Size of the placement area (-10 to 10)
-            world_file="filled_world.world"
-        )
-    except Exception as e:
-        print(f"Unexpected error: {e}")
+    main()
 
