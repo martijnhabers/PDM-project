@@ -3,11 +3,39 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-def extract_obstacles(world_file):
+def generate_ocupation_matrix(world_file, z_layers = None, word_res = None, padding = None, word_size = None, debug = False):
 
-    word_res=0.1
-    padding = 0.1
-    word_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 10}
+    if z_layers is None:
+        z_layers = 1
+    if word_res is None:
+        word_res=0.1
+    if padding is None:
+        padding = 0.30
+    if word_size is None:
+        word_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 5}
+
+    ocupation_matrix = []
+
+    z_scale = (word_size["z_max"] - word_size["z_min"]) / (z_layers+1)
+
+    conversion_matrix = np.array([[word_res, 0,          0,          word_size["x_min"]], 
+                                  [0,        word_res,   0,          word_size["y_min"]], 
+                                  [0,        0,          z_scale,    word_size["z_min"]], 
+                                  [0,        0,          0,          1]])
+
+    for z_level in np.linspace(word_size["z_min"], word_size["z_max"], z_layers + 2)[1:-1]:
+        print(f"Processing layer at z={z_level}...")
+        results, word_matrix = extract_obstacles(world_file, word_res, padding, word_size, z_level)
+        ocupation_matrix.append(word_matrix)
+
+        if debug:
+            Test(results, word_matrix, word_res, word_size) 
+ 
+    return np.array(ocupation_matrix), conversion_matrix
+
+
+
+def extract_obstacles(world_file, word_res, padding, word_size, z_layer):
 
     """
     Extract all obstacles and store:
@@ -30,7 +58,7 @@ def extract_obstacles(world_file):
             cylinder = model.find(".//geometry/cylinder")
             if cylinder is not None:
                 radius = float(cylinder.find("radius").text)
-                cylinders.append({"pose": pose, "radius": radius})
+                cylinders.append({"pose": pose, "radius": radius, "height": float(cylinder.find("length").text)})
                 continue  # No need to check for box if it's a cylinder
             
             # Check for box geometry
@@ -47,7 +75,7 @@ def extract_obstacles(world_file):
     results = []
 
     for cylinder in cylinders:
-        results.append({"type": "cylinder", "pose": cylinder["pose"], "radius": cylinder["radius"]})
+        results.append({"type": "cylinder", "pose": cylinder["pose"], "radius": cylinder["radius"], "height": cylinder["height"]})
 
     for square in squares:
         results.append({"type": "square", "pose": square["pose"], "size": square["size"]})
@@ -56,8 +84,8 @@ def extract_obstacles(world_file):
     
     for obstacle in results:
 
-        if obstacle["type"] == "cylinder":
-
+        if (obstacle["type"] == "cylinder") and (obstacle["pose"][2] - obstacle["height"]/2 - padding < z_layer < obstacle["pose"][2] + obstacle["height"]/2 + padding):
+            
             x_idx =(obstacle["pose"][0] - word_size["x_min"])/word_res
             y_idx = (obstacle["pose"][1] - word_size["y_min"])/word_res
             r_idx = (obstacle["radius"] + padding)/word_res
@@ -68,14 +96,14 @@ def extract_obstacles(world_file):
                         
                         word_matrix[clamp(int(x))][clamp(int(y))] = 1
 
-        elif obstacle["type"] == "square":
-            x_idx = math.floor(obstacle["pose"][0]/word_res+100)
-            y_idx = math.floor(obstacle["pose"][1]/word_res+100)
+        elif (obstacle["type"] == "square") and (obstacle["pose"][2] - obstacle["size"][2]/2 - padding < z_layer < obstacle["pose"][2] + obstacle["size"][2]/2 + padding):
+            x_idx = math.floor(obstacle["pose"][0]/word_res - word_size["x_min"]/word_res)
+            y_idx = math.floor(obstacle["pose"][1]/word_res - word_size["y_min"]/word_res)
 
-            x_min = clamp(x_idx - math.ceil((obstacle["size"][0]+padding)/(2*word_res)))
-            y_min = clamp(y_idx - math.ceil((obstacle["size"][1]+padding)/(2*word_res)))
-            x_max = clamp(x_idx + math.ceil((obstacle["size"][0]+padding)/(2*word_res)))
-            y_max = clamp(y_idx + math.ceil((obstacle["size"][1]+padding)/(2*word_res)))
+            x_min = clamp(x_idx - math.ceil((obstacle["size"][0]+padding)/(2*word_res)), 0, word_matrix.shape[0]-1)
+            y_min = clamp(y_idx - math.ceil((obstacle["size"][1]+padding)/(2*word_res)), 0, word_matrix.shape[1]-1)
+            x_max = clamp(x_idx + math.ceil((obstacle["size"][0]+padding)/(2*word_res)), 0, word_matrix.shape[0]-1)
+            y_max = clamp(y_idx + math.ceil((obstacle["size"][1]+padding)/(2*word_res)), 0, word_matrix.shape[1]-1)
 
             for x in range(x_min, x_max+1):
                 for y in range(y_min, y_max+1):
@@ -86,22 +114,23 @@ def extract_obstacles(world_file):
 def clamp(n, lower=0, upper=199):
     return max(lower, min(n, upper))
 
-def Test(results, word_matrix):
+def Test(results, word_matrix, word_res, word_size):
+
     # Create a plot
     fig, ax = plt.subplots(figsize=(6, 6))
-    ax.set_xlim(-10, 10)
-    ax.set_ylim(-10, 10)
+    ax.set_xlim(word_size["x_min"], word_size["x_max"])
+    ax.set_ylim(word_size["y_min"], word_size["y_max"])
     ax.set_aspect('equal')
 
     # Paint the background according to the occupancy matrix
-    for i in range(200):
-        for j in range(200):
-            x= i*0.1-10
-            y= j*0.1-10
+    for i in range(word_matrix.shape[0]):
+        for j in range(word_matrix.shape[1]):
+            x= i*word_res+word_size["x_min"]
+            y= j*word_res+word_size["y_min"]
 
             if word_matrix[i, j] == 1:
                 color = 'gray'
-                rect = plt.Rectangle((x, y), 0.1, 0.1, color=color, alpha=0.5)
+                rect = plt.Rectangle((x, y), word_res, word_res, color=color, alpha=0.5)
                 ax.add_patch(rect)
 
     for obstacle in results:
@@ -115,6 +144,6 @@ def Test(results, word_matrix):
 
     plt.show()
 
-results, word_matrix = extract_obstacles("./filled_world.world")
+word_matrix, conversion_matrix = generate_ocupation_matrix("./filled_world.world", z_layers = 2, debug=True)
 
-Test(results, word_matrix)
+#np.savetxt("word_matrix.npy", word_matrix.astype(int), delimiter=",")
