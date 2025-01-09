@@ -12,7 +12,7 @@ def generate_ocupation_matrix(world_file, z_layers = None, word_res = None, padd
     if padding is None:
         padding = 0.30
     if word_size is None:
-        word_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 5}
+        word_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 3}
 
     ocupation_matrix = []
 
@@ -144,6 +144,9 @@ def Test(results, word_matrix, word_res, word_size):
 
     plt.show()
 
-word_matrix, conversion_matrix = generate_ocupation_matrix("./filled_world.world", z_layers = 2, debug=True)
+#word_matrix, conversion_matrix = generate_ocupation_matrix("./filled_world.world", z_layers = 2, debug=False)
 
-#np.savetxt("word_matrix.npy", word_matrix.astype(int), delimiter=",")
+#np.savetxt("word_matrix2.csv", word_matrix.astype(int), delimiter=",")
+
+if __name__ == "__main__":
+    word_matrix, conversion_matrix = generate_ocupation_matrix("./filled_world.world", z_layers=1, debug=False)

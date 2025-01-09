@@ -3,6 +3,12 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
+import sys
+
+sys.path.append(os.path.abspath("src/world_creator/test/"))
+
+# Import the module
+from WorldListExport import generate_ocupation_matrix
 
 # set random seeds for reproducibility
 random.seed(0)
@@ -16,9 +22,10 @@ class PRM:
         # self.graph = {"nodes": [], "edges": {}}  # Graph representation
         self.graph = nx.Graph()
 
-    def sample_free_space(self, bounds):
+    def sample_free_space(self, bounds, layer):
         # Selects sample within dimension of bounds
         sample = [int(random.uniform(bound[0], bound[1])) for bound in bounds]
+        sample.append(layer)
         return sample
 
     def distance(self, p1, p2):
@@ -27,11 +34,12 @@ class PRM:
     def build_roadmap(self, bounds):
         # Step 1: Generate random samples until we have enough
         node_id = 0
-        while len(self.graph.nodes) < self.num_samples:
-            sample = self.sample_free_space(bounds)
-            if self.collision_checker(self.occupancy_grid, sample):
-                self.graph.add_node(node_id, pos=sample)
-                node_id += 1
+        for layer in range(self.occupancy_grid.shape[0]):
+            while len(self.graph.nodes) < self.num_samples*(layer+1):
+                sample = self.sample_free_space(bounds, layer)
+                if self.collision_checker(self.occupancy_grid[layer], sample[:2]):
+                    self.graph.add_node(node_id, pos=sample)
+                    node_id += 1
 
         # Step 2: Connect neighbouring nodes and add weights
         for node in self.graph.nodes:
@@ -39,8 +47,9 @@ class PRM:
     
     def connect_to_nearest_neighbors(self, node, k):
         distances = []
+        layer = self.graph.nodes[node]['pos'][2]
         for neighbour in self.graph.nodes:
-            if node != neighbour:
+            if node != neighbour and layer <= self.graph.nodes[neighbour]['pos'][2] <= layer + 1:
                 distances.append((self.distance(self.graph.nodes[node]['pos'], self.graph.nodes[neighbour]['pos']), neighbour))
         distances.sort()
 
@@ -48,7 +57,11 @@ class PRM:
             possible_neighbour = distances.pop(0)
             node_coords = self.graph.nodes[node]['pos']
             possible_neighbour_coords = self.graph.nodes[possible_neighbour[1]]['pos']
-            if self.collision_checker(self.occupancy_grid, node_coords, possible_neighbour_coords):
+            if possible_neighbour_coords[2] == layer:
+                occupancy_grid = self.occupancy_grid[layer]
+            else:
+                occupancy_grid = self.occupancy_grid[layer] + self.occupancy_grid[layer+1]
+            if self.collision_checker(occupancy_grid, node_coords[:2], possible_neighbour_coords[:2]):
                 self.graph.add_edge(node, possible_neighbour[1], weight=float(possible_neighbour[0]))
     
 
@@ -80,7 +93,7 @@ class PRM:
             points = np.linspace(p1, p2, num_steps).astype(int)
 
             for point in points:
-                if occupancy_grid[point[0], point[1]] == 1:
+                if occupancy_grid[point[0], point[1]] > 0:
                     return False
             return True
         else:
@@ -107,24 +120,36 @@ def generate_dummy_grid(bounds):
 
 
 def plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path=None):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
     for edge in prm.graph.edges:
         node1 = prm.graph.nodes[edge[0]]['pos']
         node2 = prm.graph.nodes[edge[1]]['pos']
-        plt.plot([node1[0], node2[0]], [node1[1], node2[1]], 'gray', alpha=0.2, linewidth=1)
+        ax.plot([node1[0], node2[0]], [node1[1], node2[1]], [node1[2], node2[2]], 'gray', alpha=0.2, linewidth=1)
+
     for node in prm.graph.nodes:
-        plt.plot(prm.graph.nodes[node]['pos'][0], prm.graph.nodes[node]['pos'][1], 'ro', alpha=1, markersize=2)
+        ax.scatter(prm.graph.nodes[node]['pos'][0], prm.graph.nodes[node]['pos'][1], prm.graph.nodes[node]['pos'][2], c='r', alpha=1, s=2)
 
-    plt.imshow(grid.T, cmap='Greys', origin='lower', extent=(bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]))
-
-    plt.plot(start_point[0], start_point[1], 'purple', marker='o', markersize=10)
-    plt.plot(goal_point[0], goal_point[1], 'go', marker='o', markersize=10)
+    ax.scatter(start_point[0], start_point[1], start_point[2], c='purple', marker='o', s=100)
+    ax.scatter(goal_point[0], goal_point[1], goal_point[2], c='g', marker='o', s=100)
 
     if shortest_path is not None:
         for i in range(len(shortest_path) - 1):
             node1 = prm.graph.nodes[shortest_path[i]]['pos']
             node2 = prm.graph.nodes[shortest_path[i + 1]]['pos']
-            plt.plot([node1[0], node2[0]], [node1[1], node2[1]], 'g', linewidth=3)
+            ax.plot([node1[0], node2[0]], [node1[1], node2[1]], [node1[2], node2[2]], 'g', linewidth=3)
 
+    # Plot obstacles
+    for layer in [0]:  # range(grid.shape[0]):
+        for x in range(0, grid.shape[1], 4):
+            for y in range(0, grid.shape[2], 4):
+                if grid[layer, x, y] == 1:
+                    ax.scatter(x, y, layer, c='k', marker='o', s=10)
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
     plt.show()
 
 if __name__ == '__main__':
@@ -133,8 +158,8 @@ if __name__ == '__main__':
     bounds = [(0, 200), (0, 200)]
 
     # Start and goal points
-    start_point = (20, 20)
-    goal_point = (160, 160)
+    start_point = (20, 20, 0)
+    goal_point = (160, 160, 0)
 
     # Generate random grid with obstacles
     grid = generate_dummy_grid(bounds)
@@ -143,18 +168,17 @@ if __name__ == '__main__':
     print(os.getcwd())
 
     # import grid from csv file
-    grid = np.loadtxt('src/prm_navigation/prm_navigation/word_matrix.csv', delimiter=',')
+    grid, conversion_matrix = generate_ocupation_matrix("filled_world.world", z_layers = 2, debug=False)
     # invert the grid, 0 becomes 1, 1 becomes 0
     # grid = np.abs(grid - 1)
 
     # Create PRM object
-    prm = PRM(num_samples=400, k_neighbors=15, occupancy_grid=grid)
+    prm = PRM(num_samples=40, k_neighbors=15, occupancy_grid=grid)
     prm.build_roadmap(bounds)
     
     prm.export_to_file("graph.txt")
 
-    # Uncomment to visualize the PRM
-    shortest_path = prm.find_path(start_point, goal_point)
+    
 
     # # save shortest path to csv file, with x and y coordinates
     # shortest_path_coords = [prm.graph.nodes[node]['pos'] for node in shortest_path]
@@ -169,5 +193,7 @@ if __name__ == '__main__':
     # with open('shortest_path.py', 'w') as f:
     #     f.write(str(shortest_path_coords))
 
-
+    # Uncomment to visualize the PRM
+    shortest_path = None
+    #shortest_path = prm.find_path(start_point, goal_point)
     plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path)
