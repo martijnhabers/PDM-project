@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import math
 import rclpy
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Vector3, PoseArray
+from std_msgs.msg import String
 from drone_msgs.msg import Pose3D
 from .drone_utils.drone_object_jason import DroneObject
 import numpy as np
@@ -13,17 +14,19 @@ class DronePositionControl(DroneObject):
         self.position_metrics = PositionMetrics(self)
         self.startup_flag = False
 
+        self.action_publisher = self.create_publisher(String, 'action_topic', 10)
+
         # Listen for new waypoints
         self.traj_subscription = self.create_subscription(
-            Pose3D,
+            PoseArray,
             '/drone_trajectory',
             self.waypoint_callback,
             1024
         )
 
         self.waypoints = [{'x': -8.0, 'y': -8.0, 'z': 2.0}, 
-                          {'x': -7.1, 'y': -6.6, 'z': 2.0}, 
-                          {'x': -4.8, 'y': -5.4, 'z': 2.0}, 
+                          {'x': -7.1, 'y': -6.6, 'z': 3.0}, 
+                          {'x': -4.8, 'y': -5.4, 'z': 4.0}, 
                           {'x': -4.3, 'y': -2.9000000000000004, 'z': 2.0}, {'x': -3.5, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -3.2, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -1.3000000000000007, 'y': -1.0999999999999996, 'z': 2.0}, {'x': -1.1999999999999993, 'y': 1.9000000000000004, 'z': 2.0}, {'x': -0.6999999999999993, 'y': 2.5999999999999996, 'z': 2.0}, {'x': 1.0, 'y': 4.1, 'z': 2.0}, {'x': 2.1999999999999993, 'y': 5.5, 'z': 2.0}, {'x': 5.6, 'y': 5.800000000000001, 'z': 2.0}, {'x': 6.0, 'y': 6.0, 'z': 2.0}]
         
 
@@ -62,13 +65,16 @@ class DronePositionControl(DroneObject):
         self.ready_timer = self.create_timer(1.0, self.check_drone_ready)
 
     def waypoint_callback(self, msg):
-        x = msg.x
-        y = msg.y
-        z = msg.z
-        yaw = msg.yaw
 
-        self.waypoints.append({'x': x, 'y': y, 'z': z, 'yaw': yaw}) # Add waypoint to list
-        self.get_logger().info(f'New waypoint received: x={x}, y={y}, z={z}, yaw={yaw}')
+        for pose in msg.poses:
+            waypoint = {
+            'x': pose.position.x,
+            'y': pose.position.y,
+            'z': pose.position.z,
+            'yaw': 0.0  # Assuming yaw is not provided in PoseArray, set to 0.0 or handle accordingly
+            }
+            self.waypoints.append(waypoint)
+        self.get_logger().info(f'{len(msg.poses)} new waypoints added.')
 
     def check_drone_ready(self):
         if self.drone_spawned and self.gt_pose_received:
@@ -116,6 +122,7 @@ class DronePositionControl(DroneObject):
             self.position_metrics.log_positions()
             self.position_metrics.save_positions()
             self.waypoints = []
+            self.action_publisher.publish(String(data="new waypoint"))
             self.timer.cancel()
             self.start_sequence_timer = self.create_timer(1.0, self.start_sequence)
             return
@@ -204,7 +211,7 @@ class PositionMetrics():
         np.save(name, np.array(self.positions))
         self.positions = []
         return
-
+    
 
 def main(args=None):
     rclpy.init(args=args)
