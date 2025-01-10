@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from ament_index_python.packages import get_package_prefix
 import math
 import rclpy
 from geometry_msgs.msg import Vector3, PoseArray
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import csv
+import os
 
 class DronePositionControl(DroneObject):
     def __init__(self, namespace='simple_drone'):
@@ -29,9 +31,9 @@ class DronePositionControl(DroneObject):
 
         self.path_type = 'dummy path'
         self.waypoints = [{'x': -8.0, 'y': -8.0, 'z': 1.0}, 
-                          {'x': -7.1, 'y': -6.6, 'z': 3.0}, 
-                          {'x': -4.8, 'y': -5.4, 'z': 4.0}, 
-                          {'x': -4.3, 'y': -2.9000000000000004, 'z': 2.0}, {'x': -3.5, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -3.2, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -1.3000000000000007, 'y': -1.0999999999999996, 'z': 2.0}, {'x': -1.1999999999999993, 'y': 1.9000000000000004, 'z': 2.0}, {'x': -0.6999999999999993, 'y': 2.5999999999999996, 'z': 2.0}, {'x': 1.0, 'y': 4.1, 'z': 2.0}, {'x': 2.1999999999999993, 'y': 5.5, 'z': 2.0}, {'x': 5.6, 'y': 5.800000000000001, 'z': 2.0}, {'x': 6.0, 'y': 6.0, 'z': 2.0}]
+                          {'x': -7.1, 'y': -6.6, 'z': 3.0}] 
+                          #{'x': -4.8, 'y': -5.4, 'z': 4.0}, 
+                          #{'x': -4.3, 'y': -2.9000000000000004, 'z': 2.0}, {'x': -3.5, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -3.2, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -1.3000000000000007, 'y': -1.0999999999999996, 'z': 2.0}, {'x': -1.1999999999999993, 'y': 1.9000000000000004, 'z': 2.0}, {'x': -0.6999999999999993, 'y': 2.5999999999999996, 'z': 2.0}, {'x': 1.0, 'y': 4.1, 'z': 2.0}, {'x': 2.1999999999999993, 'y': 5.5, 'z': 2.0}, {'x': 5.6, 'y': 5.800000000000001, 'z': 2.0}, {'x': 6.0, 'y': 6.0, 'z': 2.0}]
                             
         # Construct piecewise linear path
         self.path_points = [(wp['x'], wp['y'], wp['z']) for wp in self.waypoints]
@@ -212,7 +214,11 @@ class PositionMetrics():
 
     def save_positions(self):
         name = f"path_{self.parent.waypoints[0]['x']},{self.parent.waypoints[0]['y']})_to_({self.parent.waypoints[-1]['x']},{self.parent.waypoints[-1]['y']}).npy"
+        # Get the base workspace directory
+        workspace_dir = os.path.dirname(get_package_prefix('sjtu_drone_control'))
+        self.data_dir = os.path.join(workspace_dir, '..', 'data')
         
+
         array = np.array(self.positions)
         np.save(name, array)
 
@@ -229,8 +235,12 @@ class PositionMetrics():
         
         time_taken = len(array) * 0.1
         self.parent.get_logger().info(f"Metrics: distance_travelled={distance_travelled:.2f}, time_taken={time_taken:.2f}")
+        
         #Save metrics to CSV
-        with open('data/metrics.csv', 'a', newline='') as file:
+        csv_name = os.path.join(self.data_dir, 'metrics.csv')
+        os.makedirs(os.path.dirname(csv_name), exist_ok=True)
+
+        with open(csv_name, 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow([self.parent.waypoints[0]['x'], self.parent.waypoints[0]['y'], self.parent.waypoints[-1]['x'], self.parent.waypoints[-1]['y'], self.parent.path_type, distance_travelled, time_taken])
             self.parent.get_logger().info(f"Metrics saved: distance_travelled={distance_travelled:.2f}, time_taken={time_taken:.2f}")
@@ -252,7 +262,7 @@ class PositionMetrics():
         ax = fig.add_subplot(111, projection='3d')
 
         # Plot the line
-        ax.plot(x_log, y_log, z_log, color='b', linewidth=2, label="3D Line")
+        ax.plot(x_log, y_log, z_log, color='b', linewidth=2, label="Sampled drone trajectory")
         
         # Plot the reference path
         ax.plot(ref_x, ref_y, ref_z, color='r', linestyle='--', linewidth=2, label="Reference Path")
@@ -264,7 +274,9 @@ class PositionMetrics():
         ax.legend()
 
         # Show the interactive plot
-        plt.show()
+        plot_name = os.path.join(self.data_dir, f"plot_{self.parent.waypoints[0]['x']},{self.parent.waypoints[0]['y']}_to_{self.parent.waypoints[-1]['x']},{self.parent.waypoints[-1]['y']}.png")
+        os.makedirs(os.path.dirname(plot_name), exist_ok=True)
+        plt.savefig(plot_name)
         self.parent.get_logger().info('Plot displayed.')
         return
     
