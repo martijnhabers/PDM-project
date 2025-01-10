@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name, ['prm_navigation/graph.txt']),
-        ('share/' + package_name, ['prm_navigation/graph.gml']),
+        #('share/' + package_name, ['prm_navigation/graph.gml']),
 
     ],
     install_requires=['setuptools', 'networkx'],
