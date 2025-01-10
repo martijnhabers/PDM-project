@@ -3,6 +3,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
+import json
 
 # set random seeds for reproducibility
 random.seed(0)
@@ -13,7 +14,6 @@ class PRM:
         self.num_samples = num_samples
         self.k_neighbors = k_neighbors
         self.occupancy_grid = occupancy_grid
-        # self.graph = {"nodes": [], "edges": {}}  # Graph representation
         self.graph = nx.Graph()
 
     def sample_free_space(self, bounds):
@@ -59,11 +59,25 @@ class PRM:
         if 'goal' in self.graph.nodes:
             self.graph.remove_node('goal')
 
+        # TODO: Make it so that previously added start and goal nodes are not removed, instead making a more detailed graph
+
+        # print('breakpoint')
+
         # Add start and goal nodes to the graph, connect them to their nearest neighbors
         self.graph.add_node('start', pos=start)
         self.connect_to_nearest_neighbors('start', self.k_neighbors)
         self.graph.add_node('goal', pos=goal)
         self.connect_to_nearest_neighbors('goal', self.k_neighbors)
+
+        # # print the start node and goal node
+        # print(self.graph.nodes['start'])
+        # print(self.graph.nodes['goal'])
+
+        # # Debug: Print neighbors of start and goal nodes
+        # print(f"Neighbors of start node: {list(self.graph.neighbors('start'))}")
+        # print(f"Neighbors of goal node: {list(self.graph.neighbors('goal'))}")
+
+        # print(f"Neighbours of node 0: {list(self.graph.neighbors(0))}")
 
         # Find shortest path
         return nx.dijkstra_path(self.graph, 'start', 'goal', weight='weight') 
@@ -87,10 +101,13 @@ class PRM:
             return occupancy_grid[p1[0], p1[1]] == 0
         
     def export_to_file(self, filename):
-        # Export graph to file
-        nx.write_weighted_edgelist(self.graph, filename)
-        # nx.write_gexf(self.graph, "graph.gexf")
-        nx.write_gml(self.graph, "graph.gml")
+
+        
+
+        with open(os.path.join(os.path.dirname(__file__), filename + ".json"), "w", encoding='utf-8') as f:
+            json.dump(nx.cytoscape_data(self.graph), f, indent=4)
+        
+        nx.write_gml(self.graph, os.path.join(os.path.dirname(__file__), filename + ".gml"))
         
 
 
@@ -151,10 +168,19 @@ if __name__ == '__main__':
     prm = PRM(num_samples=400, k_neighbors=15, occupancy_grid=grid)
     prm.build_roadmap(bounds)
     
-    prm.export_to_file("graph.txt")
-
     # Uncomment to visualize the PRM
-    shortest_path = prm.find_path(start_point, goal_point)
+    # shortest_path = prm.find_path(start_point, goal_point)
+    prm.export_to_file("graph")
+
+    # with open(os.path.join(os.path.dirname(__file__), "graph.json"), "r", encoding='utf-8') as f:
+    #     dummy_graph = json.load(f)
+
+    # dummy_prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid)
+    # dummy_prm.graph = nx.cytoscape_graph(dummy_graph)
+
+    # shortest_path = dummy_prm.find_path(start_point, goal_point)
+
+
 
     # # save shortest path to csv file, with x and y coordinates
     # shortest_path_coords = [prm.graph.nodes[node]['pos'] for node in shortest_path]
@@ -170,4 +196,4 @@ if __name__ == '__main__':
     #     f.write(str(shortest_path_coords))
 
 
-    plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path)
+    # plot_prm(bounds, grid, dummy_prm, start_point, goal_point, shortest_path)
