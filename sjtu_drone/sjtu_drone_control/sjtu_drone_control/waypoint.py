@@ -5,7 +5,10 @@ from geometry_msgs.msg import Vector3, PoseArray
 from std_msgs.msg import String
 from drone_msgs.msg import Pose3D
 from .drone_utils.drone_object_jason import DroneObject
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+import csv
 
 class DronePositionControl(DroneObject):
     def __init__(self, namespace='simple_drone'):
@@ -24,12 +27,12 @@ class DronePositionControl(DroneObject):
             1024
         )
 
-        self.waypoints = [{'x': -8.0, 'y': -8.0, 'z': 2.0}, 
+        self.path_type = 'dummy path'
+        self.waypoints = [{'x': -8.0, 'y': -8.0, 'z': 1.0}, 
                           {'x': -7.1, 'y': -6.6, 'z': 3.0}, 
                           {'x': -4.8, 'y': -5.4, 'z': 4.0}, 
                           {'x': -4.3, 'y': -2.9000000000000004, 'z': 2.0}, {'x': -3.5, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -3.2, 'y': -1.8000000000000007, 'z': 2.0}, {'x': -1.3000000000000007, 'y': -1.0999999999999996, 'z': 2.0}, {'x': -1.1999999999999993, 'y': 1.9000000000000004, 'z': 2.0}, {'x': -0.6999999999999993, 'y': 2.5999999999999996, 'z': 2.0}, {'x': 1.0, 'y': 4.1, 'z': 2.0}, {'x': 2.1999999999999993, 'y': 5.5, 'z': 2.0}, {'x': 5.6, 'y': 5.800000000000001, 'z': 2.0}, {'x': 6.0, 'y': 6.0, 'z': 2.0}]
-        
-
+                            
         # Construct piecewise linear path
         self.path_points = [(wp['x'], wp['y'], wp['z']) for wp in self.waypoints]
         self.segment_distances = []
@@ -65,13 +68,12 @@ class DronePositionControl(DroneObject):
         self.ready_timer = self.create_timer(1.0, self.check_drone_ready)
 
     def waypoint_callback(self, msg):
-
+        self.path_type = msg.header.frame_id
         for pose in msg.poses:
             waypoint = {
             'x': pose.position.x,
             'y': pose.position.y,
             'z': pose.position.z,
-            'yaw': 0.0  # Assuming yaw is not provided in PoseArray, set to 0.0 or handle accordingly
             }
             self.waypoints.append(waypoint)
         self.get_logger().info(f'{len(msg.poses)} new waypoints added.')
@@ -109,6 +111,7 @@ class DronePositionControl(DroneObject):
         pz = self.gt_pose.position.z
 
         self.get_logger().info(f"Current Pose: x={px:.2f}, y={py:.2f}, z={pz:.2f}")
+        self.position_metrics.log_positions()
 
         # Check actual distance to the final waypoint
         dx_final = self.final_x - px
@@ -120,6 +123,7 @@ class DronePositionControl(DroneObject):
             self.get_logger().info('Reached end of path. Hovering...')
             self.move(Vector3(), Vector3())  # hover in place
             self.position_metrics.log_positions()
+            self.get_logger().info('Saving positions...')
             self.position_metrics.save_positions()
             self.waypoints = []
             self.action_publisher.publish(String(data="new waypoint"))
@@ -208,8 +212,60 @@ class PositionMetrics():
 
     def save_positions(self):
         name = f"path_{self.parent.waypoints[0]['x']},{self.parent.waypoints[0]['y']})_to_({self.parent.waypoints[-1]['x']},{self.parent.waypoints[-1]['y']}).npy"
-        np.save(name, np.array(self.positions))
+        
+        array = np.array(self.positions)
+        np.save(name, array)
+
+        self.make_plot(array)
+        self.parent.get_logger().info(f"Positions saved to {name}")
         self.positions = []
+        distance_travelled = 0.0
+        
+        for i in range(1, len(array)):
+            dx = array[i][0] - array[i-1][0]
+            dy = array[i][1] - array[i-1][1]
+            dz = array[i][2] - array[i-1][2]
+            distance_travelled += math.sqrt(dx*dx + dy*dy + dz*dz)
+        
+        time_taken = len(array) * 0.1
+        self.parent.get_logger().info(f"Metrics: distance_travelled={distance_travelled:.2f}, time_taken={time_taken:.2f}")
+        #Save metrics to CSV
+        with open('data/metrics.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([self.parent.waypoints[0]['x'], self.parent.waypoints[0]['y'], self.parent.waypoints[-1]['x'], self.parent.waypoints[-1]['y'], self.parent.path_type, distance_travelled, time_taken])
+            self.parent.get_logger().info(f"Metrics saved: distance_travelled={distance_travelled:.2f}, time_taken={time_taken:.2f}")
+        return
+    
+    def make_plot(self,array):
+        # Extract X, Y, Z coordinates
+        x_log = array[:, 0]
+        y_log = array[:, 1]
+        z_log = array[:, 2]
+
+        # Extract reference path coordinates
+        ref_x = [wp['x'] for wp in self.parent.waypoints]
+        ref_y = [wp['y'] for wp in self.parent.waypoints]
+        ref_z = [wp['z'] for wp in self.parent.waypoints]
+
+        # Create a 3D plot
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        # Plot the line
+        ax.plot(x_log, y_log, z_log, color='b', linewidth=2, label="3D Line")
+        
+        # Plot the reference path
+        ax.plot(ref_x, ref_y, ref_z, color='r', linestyle='--', linewidth=2, label="Reference Path")
+
+        # Set labels
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        ax.legend()
+
+        # Show the interactive plot
+        plt.show()
+        self.parent.get_logger().info('Plot displayed.')
         return
     
 
