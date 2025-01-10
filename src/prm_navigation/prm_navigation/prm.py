@@ -16,14 +16,15 @@ random.seed(0)
 np.random.seed(0)
 
 class PRM:
-    def __init__(self, num_samples, k_neighbors, occupancy_grid):
+    def __init__(self, num_samples, k_neighbors, occupancy_grid, conversion_matrix=np.eye(4)):
         self.num_samples = num_samples
         self.k_neighbors = k_neighbors
         self.occupancy_grid = occupancy_grid
         # self.graph = {"nodes": [], "edges": {}}  # Graph representation
         self.graph = nx.Graph()
         self.start, self.goal = None, None
-    
+        self.conversion_matrix = conversion_matrix
+
     def compute_distance_matrix(self, add_goal = False):
 
         points_matrix = np.array([[node, 
@@ -37,12 +38,13 @@ class PRM:
             list_nodes = self.graph.nodes
         else:
             list_nodes = self.graph.nodes[-2:]
+        norm_weight = self.conversion_matrix[:3,:3]**2
 
         for node1 in list_nodes:
             layer = points_matrix[node1,3]
             valid_idx = (((points_matrix[:,3] == layer) | (points_matrix[:,3] == layer +1) | (points_matrix[:,3] == layer -1)) & (points_matrix[:,0] < node1))
             aux_matrix = points_matrix[valid_idx ,1:] - points_matrix[node1, 1:]
-            self.distance_matrix[valid_idx, node1] = np.diag(aux_matrix @ aux_matrix.T)
+            self.distance_matrix[valid_idx, node1] = np.diag(aux_matrix @ norm_weight @aux_matrix.T)
         
         lower_tring_idx = np.tril_indices(len(self.graph.nodes))
         self.distance_matrix[lower_tring_idx] = (self.distance_matrix.T)[lower_tring_idx]
@@ -60,7 +62,7 @@ class PRM:
         for layer in range(self.occupancy_grid.shape[0]):
             while len(self.graph.nodes) < self.num_samples*(layer+1):
                 sample = self.sample_free_space(bounds, layer)
-                if self.collision_checker(self.occupancy_grid, sample):
+                if self.collision_checker(sample):
                     self.graph.add_node(node_id, pos=sample)
                     node_id += 1
 
@@ -77,7 +79,7 @@ class PRM:
         distances = distances[distances[:node, 0].argsort()]
 
         for i, neighbour in enumerate(distances[:,1]):
-            if self.collision_checker(self.occupancy_grid, self.graph.nodes[node]['pos'], self.distance_matrix[int(node), int(neighbour)] ,self.graph.nodes[neighbour]['pos']):
+            if self.collision_checker(self.graph.nodes[node]['pos'], self.graph.nodes[neighbour]['pos']):
                 self.graph.add_edge(node, neighbour, weight=float(distances[i, 0]))
 
             if len(self.graph.edges(node)) >= k:
@@ -102,22 +104,20 @@ class PRM:
         # Find shortest path
         return nx.dijkstra_path(self.graph, self.start, self.goal, weight='weight') 
     
-    def collision_checker(self, occupancy_grid, p1, distance = 1/3 ,p2=None):
+    def collision_checker(self, p1,p2=None):
         # Function that checks if either a point collides
         # OR
         # if a line connecting two points collides with an obstacle
-        if distance == np.inf:
-            return False
         
         p1 = np.array(p1)
         p2 = np.round(p1 if p2 is None else p2)
-        num_steps = np.round(math.sqrt(distance)*3).astype(int)
+        num_steps = np.round(np.sum(np.abs(p2-p1))*2+1).astype(int)
         points = np.linspace(p1, p2, num=num_steps).astype(int)
 
         layers = np.unique(points[:, 2])
         points = np.unique(points[:,:2], axis=0)
 
-        return np.all(np.array([occupancy_grid[layer, points[:, 0], points[:, 1]] == 0 for layer in layers]))
+        return np.all(np.array([self.occupancy_grid[layer, points[:, 0], points[:, 1]] == 0 for layer in layers]))
 
     def export_to_file(self, filename):
         # Export graph to file
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     # grid = np.abs(grid - 1)
 
     # Create PRM object
-    prm = PRM(num_samples=150, k_neighbors=5, occupancy_grid=grid)
+    prm = PRM(num_samples=150, k_neighbors=5, occupancy_grid=grid, conversion_matrix=conversion_matrix)
     prm.build_roadmap(bounds)
     
     prm.export_to_file("graph.txt")

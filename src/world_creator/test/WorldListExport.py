@@ -22,10 +22,12 @@ def generate_ocupation_matrix(world_file, z_layers = None, word_res = None, padd
                                   [0,        word_res,   0,          word_size["y_min"]], 
                                   [0,        0,          z_scale,    word_size["z_min"]], 
                                   [0,        0,          0,          1]])
+    
+    results = get_objects_from_world(world_file)
 
     for z_level in np.linspace(word_size["z_min"], word_size["z_max"], z_layers + 2)[1:-1]:
         print(f"Processing layer at z={z_level}...")
-        results, word_matrix = extract_obstacles(world_file, word_res, padding, word_size, z_level)
+        results, word_matrix = extract_obstacles(results, word_res, padding, word_size, z_level)
         ocupation_matrix.append(word_matrix)
 
         if debug:
@@ -33,9 +35,7 @@ def generate_ocupation_matrix(world_file, z_layers = None, word_res = None, padd
  
     return np.array(ocupation_matrix), conversion_matrix
 
-
-
-def extract_obstacles(world_file, word_res, padding, word_size, z_layer):
+def get_objects_from_world(world_file):
 
     """
     Extract all obstacles and store:
@@ -79,6 +79,10 @@ def extract_obstacles(world_file, word_res, padding, word_size, z_layer):
 
     for square in squares:
         results.append({"type": "square", "pose": square["pose"], "size": square["size"]})
+
+    return results
+
+def extract_obstacles(results, word_res, padding, word_size, z_layer):
 
     word_matrix = np.zeros((int((word_size["x_max"]-word_size["x_min"])/word_res), int((word_size["y_max"]-word_size["y_min"])/word_res)))
     
