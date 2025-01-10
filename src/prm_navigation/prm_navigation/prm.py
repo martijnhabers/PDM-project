@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import os
 import sys
+import math
 
 sys.path.append(os.path.abspath("src/world_creator/test/"))
 
@@ -21,6 +22,31 @@ class PRM:
         self.occupancy_grid = occupancy_grid
         # self.graph = {"nodes": [], "edges": {}}  # Graph representation
         self.graph = nx.Graph()
+        self.start, self.goal = None, None
+    
+    def compute_distance_matrix(self, add_goal = False):
+
+        points_matrix = np.array([[node, 
+                                   self.graph.nodes[node]['pos'][0],
+                                   self.graph.nodes[node]['pos'][1], 
+                                   self.graph.nodes[node]['pos'][2]] for node in self.graph.nodes])
+
+        if not add_goal:
+            # Create a distance matrix
+            self.distance_matrix = np.zeros((len(self.graph.nodes), len(self.graph.nodes)))
+            list_nodes = self.graph.nodes
+        else:
+            list_nodes = self.graph.nodes[-2:]
+
+        for node1 in list_nodes:
+            layer = points_matrix[node1,3]
+            valid_idx = (((points_matrix[:,3] == layer) | (points_matrix[:,3] == layer +1) | (points_matrix[:,3] == layer -1)) & (points_matrix[:,0] < node1))
+            aux_matrix = points_matrix[valid_idx ,1:] - points_matrix[node1, 1:]
+            self.distance_matrix[valid_idx, node1] = np.diag(aux_matrix @ aux_matrix.T)
+        
+        lower_tring_idx = np.tril_indices(len(self.graph.nodes))
+        self.distance_matrix[lower_tring_idx] = (self.distance_matrix.T)[lower_tring_idx]
+        self.distance_matrix[self.distance_matrix == 0] = np.inf 
 
     def sample_free_space(self, bounds, layer):
         # Selects sample within dimension of bounds
@@ -28,85 +54,77 @@ class PRM:
         sample.append(layer)
         return sample
 
-    def distance(self, p1, p2):
-        return np.linalg.norm(np.array(p1) - np.array(p2))
-
     def build_roadmap(self, bounds):
         # Step 1: Generate random samples until we have enough
         node_id = 0
         for layer in range(self.occupancy_grid.shape[0]):
             while len(self.graph.nodes) < self.num_samples*(layer+1):
                 sample = self.sample_free_space(bounds, layer)
-                if self.collision_checker(self.occupancy_grid[layer], sample[:2]):
+                if self.collision_checker(self.occupancy_grid, sample):
                     self.graph.add_node(node_id, pos=sample)
                     node_id += 1
+
+        #Create Distance Matrix
+        self.compute_distance_matrix()
 
         # Step 2: Connect neighbouring nodes and add weights
         for node in self.graph.nodes:
             self.connect_to_nearest_neighbors(node, self.k_neighbors)
     
     def connect_to_nearest_neighbors(self, node, k):
-        distances = []
-        layer = self.graph.nodes[node]['pos'][2]
-        for neighbour in self.graph.nodes:
-            if node != neighbour and layer <= self.graph.nodes[neighbour]['pos'][2] <= layer + 1:
-                distances.append((self.distance(self.graph.nodes[node]['pos'], self.graph.nodes[neighbour]['pos']), neighbour))
-        distances.sort()
 
-        while len(self.graph.edges(node)) < k and distances:
-            possible_neighbour = distances.pop(0)
-            node_coords = self.graph.nodes[node]['pos']
-            possible_neighbour_coords = self.graph.nodes[possible_neighbour[1]]['pos']
-            if possible_neighbour_coords[2] == layer:
-                occupancy_grid = self.occupancy_grid[layer]
-            else:
-                occupancy_grid = self.occupancy_grid[layer] + self.occupancy_grid[layer+1]
-            if self.collision_checker(occupancy_grid, node_coords[:2], possible_neighbour_coords[:2]):
-                self.graph.add_edge(node, possible_neighbour[1], weight=float(possible_neighbour[0]))
-    
+        distances = np.vstack((self.distance_matrix[node,:],np.array(self.graph.nodes))).T
+        distances = distances[distances[:node, 0].argsort()]
+
+        for i, neighbour in enumerate(distances[:,1]):
+            if self.collision_checker(self.occupancy_grid, self.graph.nodes[node]['pos'], self.distance_matrix[int(node), int(neighbour)] ,self.graph.nodes[neighbour]['pos']):
+                self.graph.add_edge(node, neighbour, weight=float(distances[i, 0]))
+
+            if len(self.graph.edges(node)) >= k:
+                return
+        return   
 
     def find_path(self, start, goal):
         # if start or goal already in graph, remove them
-        if 'start' in self.graph.nodes:
-            self.graph.remove_node('start')
-        if 'goal' in self.graph.nodes:
-            self.graph.remove_node('goal')
+        if self.start in self.graph.nodes:
+            self.graph.remove_node(self.start)
+        if self.goal in self.graph.nodes:
+            self.graph.remove_node(self.goal)
 
         # Add start and goal nodes to the graph, connect them to their nearest neighbors
-        self.graph.add_node('start', pos=start)
-        self.connect_to_nearest_neighbors('start', self.k_neighbors)
-        self.graph.add_node('goal', pos=goal)
-        self.connect_to_nearest_neighbors('goal', self.k_neighbors)
+        self.start, self.goal = max(self.graph.nodes) + 1, max(self.graph.nodes) + 2
+        self.graph.add_node(self.start, pos=start)
+        self.graph.add_node(self.goal, pos=goal)
+        self.compute_distance_matrix()
+        self.connect_to_nearest_neighbors(self.start, self.k_neighbors)
+        self.connect_to_nearest_neighbors(self.goal, self.k_neighbors)
 
         # Find shortest path
-        return nx.dijkstra_path(self.graph, 'start', 'goal', weight='weight') 
+        return nx.dijkstra_path(self.graph, self.start, self.goal, weight='weight') 
     
-    def collision_checker(self, occupancy_grid, p1, p2=None):
+    def collision_checker(self, occupancy_grid, p1, distance = 1/3 ,p2=None):
         # Function that checks if either a point collides
         # OR
         # if a line connecting two points collides with an obstacle
-
-        p1 = np.round(p1)
-        if p2 is not None:
-            p2 = np.round(p2)
-            num_steps = np.round(self.distance(p1, p2)).astype(int)
-            points = np.linspace(p1, p2, num_steps).astype(int)
-
-            for point in points:
-                if occupancy_grid[point[0], point[1]] > 0:
-                    return False
-            return True
-        else:
-            return occupancy_grid[p1[0], p1[1]] == 0
+        if distance == np.inf:
+            return False
         
+        p1 = np.array(p1)
+        p2 = np.round(p1 if p2 is None else p2)
+        num_steps = np.round(math.sqrt(distance)*3).astype(int)
+        points = np.linspace(p1, p2, num=num_steps).astype(int)
+
+        layers = np.unique(points[:, 2])
+        points = np.unique(points[:,:2], axis=0)
+
+        return np.all(np.array([occupancy_grid[layer, points[:, 0], points[:, 1]] == 0 for layer in layers]))
+
     def export_to_file(self, filename):
         # Export graph to file
         nx.write_weighted_edgelist(self.graph, filename)
         # nx.write_gexf(self.graph, "graph.gexf")
         nx.write_gml(self.graph, "graph.gml")
         
-
-
 def generate_dummy_grid(bounds):
     grid = np.zeros((bounds[0][1], bounds[1][1]))
     # generate 6 obstacles that fall within the bounds
@@ -118,38 +136,30 @@ def generate_dummy_grid(bounds):
         grid[x:x + width, y:y + height] = 1
     return grid
 
-
 def plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path=None):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
     for edge in prm.graph.edges:
-        node1 = prm.graph.nodes[edge[0]]['pos']
-        node2 = prm.graph.nodes[edge[1]]['pos']
-        ax.plot([node1[0], node2[0]], [node1[1], node2[1]], [node1[2], node2[2]], 'gray', alpha=0.2, linewidth=1)
-
+        node1 = prm.graph.nodes[edge[0]]['pos'][:2]
+        node2 = prm.graph.nodes[edge[1]]['pos'][:2]
+        plt.plot([node1[0], node2[0]], [node1[1], node2[1]], 'gray', alpha=0.2, linewidth=1)
     for node in prm.graph.nodes:
-        ax.scatter(prm.graph.nodes[node]['pos'][0], prm.graph.nodes[node]['pos'][1], prm.graph.nodes[node]['pos'][2], c='r', alpha=1, s=2)
+        plt.plot(prm.graph.nodes[node]['pos'][0], prm.graph.nodes[node]['pos'][1], 'ro', alpha=1, markersize=2)
 
-    ax.scatter(start_point[0], start_point[1], start_point[2], c='purple', marker='o', s=100)
-    ax.scatter(goal_point[0], goal_point[1], goal_point[2], c='g', marker='o', s=100)
+    plt.imshow(grid.T, cmap='Greys', origin='lower', extent=(bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]))
+
+    plt.plot(start_point[0], start_point[1], 'purple', marker='o', markersize=10)
+    plt.plot(goal_point[0], goal_point[1], 'go', marker='o', markersize=10)
 
     if shortest_path is not None:
         for i in range(len(shortest_path) - 1):
             node1 = prm.graph.nodes[shortest_path[i]]['pos']
             node2 = prm.graph.nodes[shortest_path[i + 1]]['pos']
-            ax.plot([node1[0], node2[0]], [node1[1], node2[1]], [node1[2], node2[2]], 'g', linewidth=3)
+            plt.plot([node1[0], node2[0]], [node1[1], node2[1]], 'g', linewidth=3)
 
-    # Plot obstacles
-    for layer in [0]:  # range(grid.shape[0]):
-        for x in range(0, grid.shape[1], 4):
-            for y in range(0, grid.shape[2], 4):
-                if grid[layer, x, y] == 1:
-                    ax.scatter(x, y, layer, c='k', marker='o', s=10)
-
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    # # Plot obstacles
+    # for x in range(grid.shape[0]):
+    #     for y in range(grid.shape[1]):
+    #         if grid[x, y] == 1:
+    #             plt.scatter(x, y, c='k', marker='o', s=10)
     plt.show()
 
 if __name__ == '__main__':
@@ -173,7 +183,7 @@ if __name__ == '__main__':
     # grid = np.abs(grid - 1)
 
     # Create PRM object
-    prm = PRM(num_samples=40, k_neighbors=15, occupancy_grid=grid)
+    prm = PRM(num_samples=150, k_neighbors=5, occupancy_grid=grid)
     prm.build_roadmap(bounds)
     
     prm.export_to_file("graph.txt")
@@ -195,5 +205,5 @@ if __name__ == '__main__':
 
     # Uncomment to visualize the PRM
     shortest_path = None
-    #shortest_path = prm.find_path(start_point, goal_point)
-    plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path)
+    shortest_path = prm.find_path(start_point, goal_point)
+    plot_prm(bounds, grid[0], prm, start_point, goal_point, shortest_path)
