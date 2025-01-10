@@ -1,0 +1,1876 @@
+
+    <sdf version="1.6">
+        <world name="default">
+            
+        <include>
+            <uri>model://ground_plane</uri>
+        </include>
+    
+            
+        <model name="obstacle_0">
+            <pose>-7.1132948156340685 -7.270143338580899 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.349690734021554 1.349690734021554 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.349690734021554 1.349690734021554 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_1">
+            <pose>4.230392283676991 -3.960238205161824 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.4583428541846168 1.4583428541846168 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.4583428541846168 1.4583428541846168 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_2">
+            <pose>2.9751606346203108 0.39281557199467443 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.796778175311845 0.796778175311845 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.796778175311845 0.796778175311845 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_3">
+            <pose>-1.783506370678003 5.676373888355723 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.0941648009053304 1.0941648009053304 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.0941648009053304 1.0941648009053304 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_4">
+            <pose>-3.2226011440357265 -2.6284382446565395 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.8791130934714049 1.8791130934714049 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.8791130934714049 1.8791130934714049 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_5">
+            <pose>-6.501147133647304 8.533523498937782 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.8713271064853699</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.8713271064853699</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_6">
+            <pose>-8.84210235712813 -9.634123136632306 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.3904065578381155 1.3904065578381155 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.3904065578381155 1.3904065578381155 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_7">
+            <pose>2.9711744948907963 8.832051246906303 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.0038714799402988 1.0038714799402988 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.0038714799402988 1.0038714799402988 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_8">
+            <pose>1.9685704474900163 -6.821253247546819 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.8581134021873117</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.8581134021873117</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_9">
+            <pose>0.7762989805563674 -4.514341771424329 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5266504350652059 0.5266504350652059 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5266504350652059 0.5266504350652059 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_10">
+            <pose>5.999658984495216 9.642775143427972 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.5664065331805188 1.5664065331805188 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.5664065331805188 1.5664065331805188 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_11">
+            <pose>-5.190077597032139 1.03321504861254 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.6087045543077625</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.6087045543077625</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_12">
+            <pose>-3.1603664871046977 -6.891360295252675 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.5962736869990903 1.5962736869990903 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.5962736869990903 1.5962736869990903 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_13">
+            <pose>-9.483875329363505 8.140447785086273 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.9726678857587019 0.9726678857587019 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.9726678857587019 0.9726678857587019 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_14">
+            <pose>6.298947340190523 2.042524881661338 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.7560167936863222 1.7560167936863222 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.7560167936863222 1.7560167936863222 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_15">
+            <pose>-3.475594851023227 7.097647216275806 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.7603915453897878 0.7603915453897878 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.7603915453897878 0.7603915453897878 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_16">
+            <pose>-0.027048324844830773 -1.9149309083357586 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.49154801232459056</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.49154801232459056</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_17">
+            <pose>4.913218085581175 5.2575025558358455 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.737277214091639 0.737277214091639 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.737277214091639 0.737277214091639 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_18">
+            <pose>-7.674880454903521 -2.295748029944404 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.4088320516359686</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.4088320516359686</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_19">
+            <pose>-9.855389388600138 5.273528108501996 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.8800175459084116</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.8800175459084116</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_20">
+            <pose>7.483809612096927 -2.3086597103244033 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.7967223326550812 1.7967223326550812 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.7967223326550812 1.7967223326550812 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_21">
+            <pose>4.311872055380439 -9.882866411968351 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.5844893467421155 1.5844893467421155 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.5844893467421155 1.5844893467421155 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_22">
+            <pose>3.575036641506413 2.270374860792261 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5869381161543967 0.5869381161543967 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5869381161543967 0.5869381161543967 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_23">
+            <pose>9.204461217318165 -9.42379730179596 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.598701812407317 0.598701812407317 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.598701812407317 0.598701812407317 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_24">
+            <pose>7.980654943358466 5.2931134974842475 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.7523340520150001 0.7523340520150001 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.7523340520150001 0.7523340520150001 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_25">
+            <pose>-1.9576264719456837 1.014977005767701 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.6195996175075473</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.6195996175075473</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_26">
+            <pose>3.9092647582700906 7.03616915472448 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.5006683555395235</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.5006683555395235</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_27">
+            <pose>8.029263152096998 -7.234359471475855 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.9041477584630132</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.9041477584630132</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_28">
+            <pose>-9.519715677816706 0.5465134439197961 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.6911796809964517</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.6911796809964517</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_29">
+            <pose>4.336097908198193 -0.8526469441683027 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3379942881903942</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3379942881903942</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_30">
+            <pose>-6.941949963841358 3.5376708216031645 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.3200294872695775 1.3200294872695775 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.3200294872695775 1.3200294872695775 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_31">
+            <pose>9.955192764836966 6.511978370342682 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.40150574014450124</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.40150574014450124</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_32">
+            <pose>0.11470973885292501 8.141081684277719 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.28188794970680264</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.28188794970680264</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_33">
+            <pose>1.6345322502837227 -1.2938820253500776 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.37761932053979985</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.37761932053979985</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_34">
+            <pose>2.0288594957277937 4.520644372856166 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5623996867683729 0.5623996867683729 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5623996867683729 0.5623996867683729 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_35">
+            <pose>-4.937692026854032 -5.1228593205729105 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.8873250241315456 0.8873250241315456 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.8873250241315456 0.8873250241315456 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_36">
+            <pose>-9.233003873018621 2.7842793576351035 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.7882814017789144 0.7882814017789144 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.7882814017789144 0.7882814017789144 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_37">
+            <pose>0.34547505818853175 -9.971868608273798 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.7278940071236033 0.7278940071236033 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.7278940071236033 0.7278940071236033 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_38">
+            <pose>-1.8462729947387366 9.454108297191638 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.7644524070812495</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.7644524070812495</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_39">
+            <pose>9.25651493200034 9.949424738772244 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3784721601723122</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3784721601723122</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_40">
+            <pose>-9.574418456421832 -6.647890213495384 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3501983428181214</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3501983428181214</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_41">
+            <pose>0.6853060075232076 3.7363320081433233 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.7715662080040709 0.7715662080040709 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.7715662080040709 0.7715662080040709 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_42">
+            <pose>-0.7209725321134677 2.5153717256918195 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.30386724362440193</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.30386724362440193</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_43">
+            <pose>0.9001077750422066 9.985082850497975 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.8675510460557181 0.8675510460557181 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.8675510460557181 0.8675510460557181 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_44">
+            <pose>9.932727748275308 -0.08680366556350627 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>1.3711550859729815 1.3711550859729815 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>1.3711550859729815 1.3711550859729815 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_45">
+            <pose>-4.23203023415073 4.022312468466485 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.6824906566088857 0.6824906566088857 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.6824906566088857 0.6824906566088857 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_46">
+            <pose>7.692404388574641 7.5600700320139715 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.6258831953617735 0.6258831953617735 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.6258831953617735 0.6258831953617735 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_47">
+            <pose>-9.598286048100581 -4.962622730818181 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.263730961779803</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.263730961779803</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_48">
+            <pose>-6.959165553296853 -3.862951641196622 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.4325138378305365</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.4325138378305365</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_49">
+            <pose>9.365400141792904 3.042405065130037 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.5382741725307649</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.5382741725307649</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_50">
+            <pose>-4.3528875016898505 -8.981419703401595 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3217296740079192</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3217296740079192</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_51">
+            <pose>8.805169189310611 8.481404718037446 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3589872595843865</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3589872595843865</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_52">
+            <pose>1.376222361502947 -2.9940501612959842 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.6054922334896192 0.6054922334896192 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.6054922334896192 0.6054922334896192 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_53">
+            <pose>-0.7798475698818379 -5.667193114575819 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.9735281707004695 0.9735281707004695 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.9735281707004695 0.9735281707004695 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_54">
+            <pose>4.0615821329453645 3.8253974686031462 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3951740270827882</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3951740270827882</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_55">
+            <pose>-1.7587768065642422 3.570108999073277 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5677917210748967 0.5677917210748967 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5677917210748967 0.5677917210748967 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_56">
+            <pose>4.625064375567538 -6.829506337859483 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.6425460703927781 0.6425460703927781 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.6425460703927781 0.6425460703927781 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_57">
+            <pose>6.48997399660281 5.183373423892286 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3702935492063396</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3702935492063396</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_58">
+            <pose>0.9062043102744113 0.7078825752695614 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.7925756872987866 0.7925756872987866 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.7925756872987866 0.7925756872987866 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_59">
+            <pose>1.581989922791287 6.9753633139931495 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5919049512516402 0.5919049512516402 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5919049512516402 0.5919049512516402 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_60">
+            <pose>-1.228973060951768 7.2247821526792 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2561928039699254</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2561928039699254</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_62">
+            <pose>-7.468883847312222 0.007631792175654795 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2967939455061823</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2967939455061823</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_63">
+            <pose>-0.6462833318049466 -7.7892387516723005 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3854522121153368</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3854522121153368</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_64">
+            <pose>9.80950716732239 -5.170183207457968 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3473716324106076</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3473716324106076</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_65">
+            <pose>-5.475046690335102 5.479004106643114 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.38421584444846413</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.38421584444846413</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_66">
+            <pose>2.395743649741629 1.7585219356279183 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.6629005733502863 0.6629005733502863 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.6629005733502863 0.6629005733502863 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_67">
+            <pose>-2.0275214469928438 -9.4617536749818 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.7863762160498207 0.7863762160498207 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.7863762160498207 0.7863762160498207 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_68">
+            <pose>-9.39839992618059 -2.051176097043655 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.4001153783983956</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.4001153783983956</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_69">
+            <pose>-5.1428904438426315 2.9503922275664234 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5703439658581637 0.5703439658581637 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5703439658581637 0.5703439658581637 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_70">
+            <pose>0.011956700700711309 6.248463887223398 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2979553462221076</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2979553462221076</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_71">
+            <pose>-5.565461884561951 -0.9754088886193557 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.6094558394115746 0.6094558394115746 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.6094558394115746 0.6094558394115746 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_72">
+            <pose>3.0022114183850377 -1.1906786937277918 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5683548670163998 0.5683548670163998 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5683548670163998 0.5683548670163998 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_74">
+            <pose>6.11221662098664 7.017765805951729 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5296269352306215 0.5296269352306215 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5296269352306215 0.5296269352306215 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_75">
+            <pose>-4.015904543027373 5.661476845622948 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.33488468395865867</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.33488468395865867</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_76">
+            <pose>-2.7855446161342794 2.7525658691695902 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5477836114721842 0.5477836114721842 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5477836114721842 0.5477836114721842 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_78">
+            <pose>9.718964682108993 -3.443582083823107 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3305874208155728</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3305874208155728</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_79">
+            <pose>6.752069655718785 -9.412399027279514 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5375412207723742 0.5375412207723742 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5375412207723742 0.5375412207723742 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_80">
+            <pose>-5.886542134231716 -2.4538310706216198 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5780566022555307 0.5780566022555307 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5780566022555307 0.5780566022555307 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_81">
+            <pose>-0.6623406260577891 4.262855895592407 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2629238090567472</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2629238090567472</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_84">
+            <pose>-6.989684892896404 5.556681959370744 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2775123843841143</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2775123843841143</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_85">
+            <pose>-4.151205212562528 9.136211702259484 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3229932907633154</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.3229932907633154</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_86">
+            <pose>0.567044145294826 2.3434607542308825 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.279743452342999</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.279743452342999</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_87">
+            <pose>5.850996538592323 -0.3042195617982202 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2595098493893072</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2595098493893072</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_90">
+            <pose>-0.976893495765152 -3.8385701530957217 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5903265007590748 0.5903265007590748 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5903265007590748 0.5903265007590748 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_91">
+            <pose>-5.5196841306851585 -9.928181525033175 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.29627858549460306</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.29627858549460306</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_92">
+            <pose>9.909648950344472 -2.181673456255682 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2507309157486085</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2507309157486085</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_94">
+            <pose>8.707297544230254 7.042802460389812 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5077918664821802 0.5077918664821802 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5077918664821802 0.5077918664821802 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_95">
+            <pose>-7.785635823756351 1.693536065831605 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.31666335546893926</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.31666335546893926</radius>
+                            <length>3.0</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        <model name="obstacle_96">
+            <pose>-8.710172169689512 -4.027240074016978 1.5 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.5678870526072044 0.5678870526072044 3.0</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.5678870526072044 0.5678870526072044 3.0</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+        
+        </world>
+    </sdf>
+    
