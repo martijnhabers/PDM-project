@@ -19,14 +19,15 @@ class PRMNode(Node):
         self.roadmap = nx.read_gml(roadmap_file)
 
         # Create a PRM object with the loaded graph
-        grid = np.loadtxt('src/prm_navigation/prm_navigation/occupancy_grid.csv', delimiter=',')
+        grid = np.loadtxt('build/prm_navigation/prm_navigation/occupancy_grid.csv', delimiter=',')
 
         self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid)
         self.prm.graph = self.roadmap
 
         self.current_position = None
         self.goal_position = None
-
+        self.msg_previous = None
+        
         self.create_subscription(Pose, '/simple_drone/gt_pose', self.current_position_callback, 10)
         self.create_subscription(Pose, '/goal_position', self.goal_position_callback, 10)
 
@@ -62,7 +63,12 @@ class PRMNode(Node):
     def current_position_callback(self, msg):
         self.current_position = [msg.position.x, msg.position.y]
         self.get_logger().info(f'Current position set to {self.current_position}', throttle_duration_sec = 2)
+    
     def goal_position_callback(self, msg):
+        if msg == self.msg_previous:
+            return
+        self.msg_previous = msg
+
         self.goal_position = [msg.position.x, msg.position.y]
         self.get_logger().info(f'Goal position set to {self.goal_position}')
         shortest_path = self.find_path()
@@ -75,7 +81,7 @@ class PRMNode(Node):
         pose_array = PoseArray()
 
         # set the frame id
-        pose_array.header.frame_id = 'map'
+        pose_array.header.frame_id = 'prm'
 
         pose_array.header.stamp = self.get_clock().now().to_msg()
 

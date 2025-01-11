@@ -17,6 +17,7 @@ class DronePositionControl(DroneObject):
         self.get_logger().info('DronePositionControl node initialized.')
         self.position_metrics = PositionMetrics(self)
         self.startup_flag = False
+        self.msg_previous = None
 
         self.action_publisher = self.create_publisher(String, 'action_topic', 10)
 
@@ -29,28 +30,11 @@ class DronePositionControl(DroneObject):
         )
 
         self.path_type = 'dummy path'
-        self.waypoints = [{'x': -8.0, 'y': -8.0, 'z': 1.0}] 
-        
-        # Construct piecewise linear path
-        self.path_points = [(wp['x'], wp['y'], wp['z']) for wp in self.waypoints]
-        self.segment_distances = []
-        self.total_path_length = 0.0
-        for i in range(len(self.path_points) - 1):
-            dx = self.path_points[i+1][0] - self.path_points[i][0]
-            dy = self.path_points[i+1][1] - self.path_points[i][1]
-            dz = self.path_points[i+1][2] - self.path_points[i][2]
-            seg_len = math.sqrt(dx*dx + dy*dy + dz*dz)
-            self.segment_distances.append(seg_len)
-            self.total_path_length += seg_len
-
-        # Set final waypoint
-        self.final_waypoint = self.path_points[-1]
-        self.final_x, self.final_y, self.final_z = self.final_waypoint
+        self.waypoints = [{'x': -8.0, 'y': -8.0, 'z': 1.0}]
 
         # A smaller lookahead for sharper corners
         self.lookahead_distance = 0.2
-        self.current_path_position = 0.0
-
+        
         # Control parameters
         self.kp_pos = 0.2
         self.kp_yaw = 0.2
@@ -66,7 +50,11 @@ class DronePositionControl(DroneObject):
         self.ready_timer = self.create_timer(1.0, self.check_drone_ready)
 
     def waypoint_callback(self, msg):
-        self.path_type = msg.header.frame_id
+        # Check if the message ID has already been processed
+        if msg == self.msg_previous:
+            return
+        self.msg_previous = msg
+
         for pose in msg.poses:
             waypoint = {
             'x': pose.position.x,
@@ -83,6 +71,25 @@ class DronePositionControl(DroneObject):
         else:
             self.get_logger().info('Waiting for drone to spawn and initial pose...')
 
+    def update_path_params(self):
+            # Construct piecewise linear path
+            self.path_points = [(wp['x'], wp['y'], wp['z']) for wp in self.waypoints]
+            self.segment_distances = []
+            self.total_path_length = 0.0
+            for i in range(len(self.path_points) - 1):
+                dx = self.path_points[i+1][0] - self.path_points[i][0]
+                dy = self.path_points[i+1][1] - self.path_points[i][1]
+                dz = self.path_points[i+1][2] - self.path_points[i][2]
+                seg_len = math.sqrt(dx*dx + dy*dy + dz*dz)
+                self.segment_distances.append(seg_len)
+                self.total_path_length += seg_len
+
+            # Set final waypoint
+            self.final_waypoint = self.path_points[-1]
+            self.final_x, self.final_y, self.final_z = self.final_waypoint
+
+            self.current_path_position = 0.0
+
     def start_sequence(self):
         if self.startup_flag == False:
             self.startup_flag = True
@@ -98,6 +105,8 @@ class DronePositionControl(DroneObject):
         if self.waypoints:
             self.start_sequence_timer.cancel()
             self.get_logger().info('Following waypoints...')
+            self.start_sequence_timer.cancel()
+            self.update_path_params()
             self.timer = self.create_timer(0.1, self.follow_path)
         else:
             self.get_logger().info('Waiting for waypoints.')
@@ -124,6 +133,7 @@ class DronePositionControl(DroneObject):
             self.get_logger().info('Saving positions...')
             self.position_metrics.save_positions()
             self.waypoints = []
+            self.current_path_position = 0.0
             self.action_publisher.publish(String(data="new waypoint"))
             self.timer.cancel()
             self.start_sequence_timer = self.create_timer(1.0, self.start_sequence)
