@@ -27,7 +27,7 @@ class PRMNode(Node):
         self.current_position = None
         self.goal_position = None
 
-        self.create_subscription(Pose, '/current_position', self.current_position_callback, 10)
+        self.create_subscription(Pose, '/simple_drone/gt_pose', self.current_position_callback, 10)
         self.create_subscription(Pose, '/goal_position', self.goal_position_callback, 10)
 
         # occupancy grid publiser
@@ -60,10 +60,10 @@ class PRMNode(Node):
         self.occupancy_grid_publisher.publish(occupancygrid_msg)
 
     def current_position_callback(self, msg):
-        self.current_position = (msg.position.x, msg.position.y)
-        self.get_logger().info(f'Current position set to {self.current_position}')
+        self.current_position = [msg.position.x, msg.position.y]
+        self.get_logger().info(f'Current position set to {self.current_position}', throttle_duration_sec = 2)
     def goal_position_callback(self, msg):
-        self.goal_position = (msg.position.x, msg.position.y)
+        self.goal_position = [msg.position.x, msg.position.y]
         self.get_logger().info(f'Goal position set to {self.goal_position}')
         shortest_path = self.find_path()
         if not shortest_path:
@@ -104,8 +104,11 @@ class PRMNode(Node):
             return
 
         # Find shortest path
+        current_pos_index =  [(x + 10) * 10 for x in self.current_position]
+        goal_pos_index = [(x + 10) * 10 for x in self.goal_position]
+
         try:
-            shortest_path = self.prm.find_path(self.current_position, self.goal_position)
+            shortest_path = self.prm.find_path(current_pos_index, goal_pos_index)
         except Exception as e:
             self.get_logger().error(f'Failed to find path: {e}')
             return None

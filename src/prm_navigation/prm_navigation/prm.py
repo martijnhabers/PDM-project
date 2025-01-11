@@ -155,12 +155,12 @@ if __name__ == '__main__':
 
     # Generate random grid with obstacles
     grid = generate_dummy_grid(bounds)
-
+    
     # print current working directory
     print(os.getcwd())
 
     # import grid from csv file
-    grid = np.loadtxt('src/prm_navigation/prm_navigation/word_matrix.csv', delimiter=',')
+    grid = np.loadtxt('src/prm_navigation/prm_navigation/occupancy_grid.csv', delimiter=',')
     # invert the grid, 0 becomes 1, 1 becomes 0
     # grid = np.abs(grid - 1)
 
