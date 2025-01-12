@@ -13,7 +13,8 @@ setup(
         ('share/' + package_name, ['prm_navigation/graph.gml']),
         ('share/' + package_name, ['prm_navigation/graph.json']),
         ('share/' + package_name, ['prm_navigation/occupancy_grid.csv']),
-        ('share/' + package_name + '/launch', ['prm_navigation/launch/prm.launch.py']),
+        # add launch file, locaetd in the launch directory of the package
+        ('share/' + package_name + '/launch', ['launch/prm.launch.py']),
 
     ],
     install_requires=['setuptools', 'networkx'],

@@ -15,7 +15,7 @@ def generate_launch_description():
     # Path to the WorldListExport.py script
     world_list_export_script = os.path.join(
         get_package_share_directory('world_creator'),
-        'test', 'world_creator', 'WorldListExport.py'
+        'test', 'WorldListExport.py'
     )
 
 
