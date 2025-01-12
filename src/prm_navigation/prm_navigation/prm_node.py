@@ -21,9 +21,10 @@ class PRMNode(Node):
         self.roadmap = nx.read_gml(roadmap_file)
 
         # Create a PRM object with the loaded graph
-        grid = np.loadtxt('src/prm_navigation/prm_navigation/occupancy_grid.csv', delimiter=',')
+        grid = np.load('src/prm_navigation/prm_navigation/occupancy_grid.npy')
+        conversion_matrix = np.load('src/prm_navigation/prm_navigation/conversion_matrix.npy')
 
-        self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid)
+        self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid, conversion_matrix=conversion_matrix)
         self.prm.graph = self.roadmap
 
         self.current_position = None
@@ -37,7 +38,7 @@ class PRMNode(Node):
         self.occupancy_grid_publisher = self.create_publisher(OccupancyGrid, '/occupancy_grid', 10)
 
         # format the grid to be published
-        self.publish_occupancy_grid(grid)
+        # self.publish_occupancy_grid(grid)
 
 
         # create publisher for desired trajectory, posearray
@@ -63,7 +64,7 @@ class PRMNode(Node):
         self.occupancy_grid_publisher.publish(occupancygrid_msg)
 
     def current_position_callback(self, msg):
-        self.current_position = [msg.position.x, msg.position.y]
+        self.current_position = [msg.position.x, msg.position.y, msg.position.z]
         self.get_logger().info(f'Current position set to {self.current_position}', throttle_duration_sec = 2)
     
     def goal_position_callback(self, msg):
@@ -71,7 +72,7 @@ class PRMNode(Node):
             return
         self.msg_previous = msg
 
-        self.goal_position = [msg.position.x, msg.position.y]
+        self.goal_position = [msg.position.x, msg.position.y, msg.position.z]
         self.get_logger().info(f'Goal position set to {self.goal_position}')
         shortest_path, path_type = self.find_path()
 
@@ -90,36 +91,54 @@ class PRMNode(Node):
 
         for node in shortest_path:
             pose = Pose()
-            pose.position = Point(x = float(self.roadmap.nodes[node]['pos'][0])/10-10, y = float(self.roadmap.nodes[node]['pos'][1])/10-10, z = 2.0)
-            # # set orientation towards the next node
-            # # not necessary, only nice for visualization
-            # if node < shortest_path[-1]:
-            #     next_node = shortest_path[shortest_path.index(node) + 1]
-            #     next_node_pos = self.roadmap.nodes[next_node]['pos']
-            #     dx = next_node_pos[0] - self.roadmap.nodes[node]['pos'][0]
-            #     dy = next_node_pos[1] - self.roadmap.nodes[node]['pos'][1]
-            #     yaw = np.arctan2(dy, dx)
-            #     pose.orientation.z = np.sin(yaw/2)
-            #     pose.orientation.w = np.cos(yaw/2)
+            point_idx = np.array(self.roadmap.nodes[node]['pos'])
+            point_idx = np.append(point_idx, 1.0)
+
+            point_coord = np.dot(self.prm.conversion_matrix, point_idx)
+            
+            print("point_coord: ", point_coord)
+
+            pose.position = Point(x = float(point_coord[0]),
+                                  y = float(point_coord[1]),
+                                  z = float(point_coord[2]))
+            
             pose_array.poses.append(pose)
 
         self.trajectory_publisher.publish(pose_array)
 
-        
+    def clamp(self, n):
+        for i, val in enumerate(n):
+            if i == 2:
+                n[i] = max(0, min(val, 3))
+            else:
+                n[i] = max(0, min(val, 199))
+        return n
 
     def find_path(self):
         if self.current_position is None or self.goal_position is None:
             self.get_logger().warn('Current or goal position not set.')
             return
 
-        # Find shortest path
-        current_pos_index =  [(x + 10) * 10 for x in self.current_position]
-        goal_pos_index = [(x + 10) * 10 for x in self.goal_position]
+        current_pos = np.array(self.current_position)
+        current_pos = np.append(current_pos, 1.0)
 
-        try:
-            shortest_path_prm = self.prm.find_path(current_pos_index, goal_pos_index)
-        except Exception as e:
-            self.get_logger().error(f'Failed to find path: {e}')
+        current_pos_index = np.dot(np.linalg.inv(self.prm.conversion_matrix), current_pos)[:3].astype(int)
+        current_pos_index = self.clamp(current_pos_index)
+
+        goal_pos = np.array(self.goal_position)
+        goal_pos = np.append(goal_pos, 1.0)
+
+        goal_pos_index = np.dot(np.linalg.inv(self.prm.conversion_matrix), goal_pos)[:3].astype(int)
+        goal_pos_index = self.clamp(goal_pos_index)
+
+        print("current_pos_index: ", np.round(current_pos_index).astype(int))
+        print("goal_pos_index: ", np.round(goal_pos_index).astype(int))
+
+        # try:
+        shortest_path_prm = self.prm.find_path(np.round(current_pos_index).astype(int), np.round(goal_pos_index).astype(int))
+        # except Exception as e:
+            # self.get_logger().error(f'Failed to find path: {e}')
+            # return
             
         #RRT:
         """try:

@@ -2,36 +2,38 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from ament_index_python.packages import get_package_share_directory
+import os
 
-def generate_ocupation_matrix(world_file, z_layers = None, word_res = None, padding = None, word_size = None, debug = False):
+def generate_ocupation_matrix(world_file, z_layers = None, world_res = None, padding = None, world_size = None, debug = False):
 
     if z_layers is None:
         z_layers = 1
-    if word_res is None:
-        word_res=0.1
+    if world_res is None:
+        world_res=0.1
     if padding is None:
-        padding = 0.30
-    if word_size is None:
-        word_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 3}
+        padding = 0.40
+    if world_size is None:
+        world_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 5}
 
     ocupation_matrix = []
 
-    z_scale = (word_size["z_max"] - word_size["z_min"]) / (z_layers+1)
+    z_scale = (world_size["z_max"] - world_size["z_min"]) / (z_layers+1)
 
-    conversion_matrix = np.array([[word_res, 0,          0,          word_size["x_min"]], 
-                                  [0,        word_res,   0,          word_size["y_min"]], 
-                                  [0,        0,          z_scale,    word_size["z_min"]], 
+    conversion_matrix = np.array([[world_res, 0,          0,         world_size["x_min"]], 
+                                  [0,        world_res,   0,         world_size["y_min"]], 
+                                  [0,        0,          z_scale,    z_scale], 
                                   [0,        0,          0,          1]])
     
     results = get_objects_from_world(world_file)
 
-    for z_level in np.linspace(word_size["z_min"], word_size["z_max"], z_layers + 2)[1:-1]:
+    for z_level in np.linspace(world_size["z_min"], world_size["z_max"], z_layers + 2)[1:-1]:
         print(f"Processing layer at z={z_level}...")
-        results, word_matrix = extract_obstacles(results, word_res, padding, word_size, z_level)
-        ocupation_matrix.append(word_matrix)
+        results, world_matrix = extract_obstacles(results, world_res, padding, world_size, z_level)
+        ocupation_matrix.append(world_matrix)
 
         if debug:
-            Test(results, word_matrix, word_res, word_size) 
+            Test(results, world_matrix, world_res, world_size) 
  
     return np.array(ocupation_matrix), conversion_matrix
 
@@ -82,59 +84,59 @@ def get_objects_from_world(world_file):
 
     return results
 
-def extract_obstacles(results, word_res, padding, word_size, z_layer):
+def extract_obstacles(results, world_res, padding, world_size, z_layer):
 
-    word_matrix = np.zeros((int((word_size["x_max"]-word_size["x_min"])/word_res), int((word_size["y_max"]-word_size["y_min"])/word_res)))
+    world_matrix = np.zeros((int((world_size["x_max"]-world_size["x_min"])/world_res), int((world_size["y_max"]-world_size["y_min"])/world_res)))
     
     for obstacle in results:
 
         if (obstacle["type"] == "cylinder") and (obstacle["pose"][2] - obstacle["height"]/2 - padding < z_layer < obstacle["pose"][2] + obstacle["height"]/2 + padding):
             
-            x_idx =(obstacle["pose"][0] - word_size["x_min"])/word_res
-            y_idx = (obstacle["pose"][1] - word_size["y_min"])/word_res
-            r_idx = (obstacle["radius"] + padding)/word_res
+            x_idx =(obstacle["pose"][0] - world_size["x_min"])/world_res
+            y_idx = (obstacle["pose"][1] - world_size["y_min"])/world_res
+            r_idx = (obstacle["radius"] + padding)/world_res
 
             for x in range( math.ceil(x_idx-(r_idx+1)),  math.ceil(x_idx+(r_idx+1))):
                 for y in range(math.ceil(y_idx-(r_idx+1)), math.ceil(y_idx+(r_idx+1))):
                     if ((x-x_idx)**2 + (y-y_idx)**2 <= (r_idx)**2) or ((x+1-x_idx)**2 + (y+1-y_idx)**2 <= (r_idx)**2) or ((x+1-x_idx)**2 + (y-y_idx)**2 <= (r_idx)**2) or ((x-x_idx)**2 + (y+1-y_idx)**2 <= (r_idx)**2):
                         
-                        word_matrix[clamp(int(x))][clamp(int(y))] = 1
+                        world_matrix[clamp(int(x))][clamp(int(y))] = 1
 
         elif (obstacle["type"] == "square") and (obstacle["pose"][2] - obstacle["size"][2]/2 - padding < z_layer < obstacle["pose"][2] + obstacle["size"][2]/2 + padding):
-            x_idx = math.floor(obstacle["pose"][0]/word_res - word_size["x_min"]/word_res)
-            y_idx = math.floor(obstacle["pose"][1]/word_res - word_size["y_min"]/word_res)
+            x_idx = math.floor(obstacle["pose"][0]/world_res - world_size["x_min"]/world_res)
+            y_idx = math.floor(obstacle["pose"][1]/world_res - world_size["y_min"]/world_res)
 
-            x_min = clamp(x_idx - math.ceil((obstacle["size"][0]+padding)/(2*word_res)), 0, word_matrix.shape[0]-1)
-            y_min = clamp(y_idx - math.ceil((obstacle["size"][1]+padding)/(2*word_res)), 0, word_matrix.shape[1]-1)
-            x_max = clamp(x_idx + math.ceil((obstacle["size"][0]+padding)/(2*word_res)), 0, word_matrix.shape[0]-1)
-            y_max = clamp(y_idx + math.ceil((obstacle["size"][1]+padding)/(2*word_res)), 0, word_matrix.shape[1]-1)
+            x_min = clamp(x_idx - math.ceil((obstacle["size"][0]+padding)/(2*world_res)), 0, world_matrix.shape[0]-1)
+            y_min = clamp(y_idx - math.ceil((obstacle["size"][1]+padding)/(2*world_res)), 0, world_matrix.shape[1]-1)
+            x_max = clamp(x_idx + math.ceil((obstacle["size"][0]+padding)/(2*world_res)), 0, world_matrix.shape[0]-1)
+            y_max = clamp(y_idx + math.ceil((obstacle["size"][1]+padding)/(2*world_res)), 0, world_matrix.shape[1]-1)
 
             for x in range(x_min, x_max+1):
                 for y in range(y_min, y_max+1):
-                    word_matrix[int(x)][int(y)] = 1
+                    world_matrix[int(x)][int(y)] = 1
 
-    return results, word_matrix
+    return results, world_matrix
 
 def clamp(n, lower=0, upper=199):
     return max(lower, min(n, upper))
 
-def Test(results, word_matrix, word_res, word_size):
+def Test(results, world_matrix, world_res, world_size):
 
     # Create a plot
     fig, ax = plt.subplots(figsize=(6, 6))
-    ax.set_xlim(word_size["x_min"], word_size["x_max"])
-    ax.set_ylim(word_size["y_min"], word_size["y_max"])
+    ax.set_xlim(world_size["x_min"], world_size["x_max"])
+    ax.set_ylim(world_size["y_min"], world_size["y_max"])
     ax.set_aspect('equal')
 
     # Paint the background according to the occupancy matrix
-    for i in range(word_matrix.shape[0]):
-        for j in range(word_matrix.shape[1]):
-            x= i*word_res+word_size["x_min"]
-            y= j*word_res+word_size["y_min"]
+    for i in range(world_matrix.shape[0]):
+        for j in range(world_matrix.shape[1]):
+            x= i*world_res+world_size["x_min"]
+            y= j*world_res+world_size["y_min"]
 
-            if word_matrix[i, j] == 1:
+            if world_matrix[i, j] == 1:
                 color = 'gray'
-                rect = plt.Rectangle((x, y), word_res, word_res, color=color, alpha=0.5)
+                rect = plt.Rectangle((x, y), world_res, world_res, color=color, alpha=0.5)
                 ax.add_patch(rect)
 
     for obstacle in results:
@@ -148,9 +150,14 @@ def Test(results, word_matrix, word_res, word_size):
 
     plt.show()
 
-#word_matrix, conversion_matrix = generate_ocupation_matrix("./filled_world.world", z_layers = 2, debug=False)
+#world_matrix, conversion_matrix = generate_ocupation_matrix("./filled_world.world", z_layers = 2, debug=False)
 
-#np.savetxt("word_matrix2.csv", word_matrix.astype(int), delimiter=",")
+world_file = os.path.join(
+            get_package_share_directory("sjtu_drone_description"),
+            "worlds", "filled_world.world"
+        )
 
 if __name__ == "__main__":
-    word_matrix, conversion_matrix = generate_ocupation_matrix("./filled_world.world", z_layers=1, debug=False)
+    world_matrix, conversion_matrix = generate_ocupation_matrix(world_file, z_layers=4, debug=False)
+    np.save('src/prm_navigation/prm_navigation/occupancy_grid.npy', world_matrix.astype(int))
+    np.save("src/prm_navigation/prm_navigation/conversion_matrix.npy", conversion_matrix)
