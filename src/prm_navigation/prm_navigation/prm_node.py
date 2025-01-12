@@ -4,8 +4,10 @@ from geometry_msgs.msg import Point, Pose, PoseArray
 from nav_msgs.msg import OccupancyGrid
 import networkx as nx
 from prm_navigation.prm import PRM
+from prm_navigation.rrt import RRT3D
 from ament_index_python.packages import get_package_share_directory
 import numpy as np
+from random import randint
 
 class PRMNode(Node):
     def __init__(self):
@@ -71,7 +73,8 @@ class PRMNode(Node):
 
         self.goal_position = [msg.position.x, msg.position.y]
         self.get_logger().info(f'Goal position set to {self.goal_position}')
-        shortest_path = self.find_path()
+        shortest_path, path_type = self.find_path()
+
         if not shortest_path:
             return
         
@@ -81,7 +84,7 @@ class PRMNode(Node):
         pose_array = PoseArray()
 
         # set the frame id
-        pose_array.header.frame_id = 'prm'
+        pose_array.header.frame_id = path_type
 
         pose_array.header.stamp = self.get_clock().now().to_msg()
 
@@ -114,11 +117,18 @@ class PRMNode(Node):
         goal_pos_index = [(x + 10) * 10 for x in self.goal_position]
 
         try:
-            shortest_path = self.prm.find_path(current_pos_index, goal_pos_index)
+            shortest_path_prm = self.prm.find_path(current_pos_index, goal_pos_index)
         except Exception as e:
             self.get_logger().error(f'Failed to find path: {e}')
-            return None
-        return shortest_path
+            
+        #RRT:
+        """try:
+            self.rrt = RRT3D(current_pos_index, goal_pos_index, self.occupancy_grid, step_size=5, max_iter=1000)
+            shortest_path_rrt = self.rrt.plan()
+        except Exception as e:
+            self.get_logger().error(f'Failed to find RRT path: {e}')"""
+    
+        return shortest_path_prm, 'prm'
     
 
 def main(args=None):
