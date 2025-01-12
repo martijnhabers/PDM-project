@@ -55,7 +55,7 @@ class DronePositionControl(DroneObject):
             return
         self.msg_previous = msg
 
-        self.path_type = msg.frame_id
+        self.path_type = msg.header.frame_id
         for pose in msg.poses:
             waypoint = {
             'x': pose.position.x,

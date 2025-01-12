@@ -21,7 +21,7 @@ class PRMNode(Node):
         self.roadmap = nx.read_gml(roadmap_file)
 
         # Create a PRM object with the loaded graph
-        grid = np.loadtxt('build/prm_navigation/prm_navigation/occupancy_grid.csv', delimiter=',')
+        grid = np.loadtxt('src/prm_navigation/prm_navigation/occupancy_grid.csv', delimiter=',')
 
         self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid)
         self.prm.graph = self.roadmap
