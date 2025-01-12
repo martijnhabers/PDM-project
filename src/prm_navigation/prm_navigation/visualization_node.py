@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from visualization_msgs.msg import Marker, MarkerArray
-from geometry_msgs.msg import Point, Pose
+from geometry_msgs.msg import Point, Pose, PoseStamped, PoseArray
+from nav_msgs.msg import Path
 import xml.etree.ElementTree as ET
 from ament_index_python.packages import get_package_share_directory
 import os
@@ -12,6 +13,16 @@ class SDFToMarkerArray(Node):
         self.publisher = self.create_publisher(MarkerArray, 'visualization_marker_array', 10)
         self.marker_array = self.parse_sdf_to_marker_array()
         self.publisher.publish(self.marker_array)
+        self.drone_path = Path()
+        self.drone_path.header.frame_id = 'map'
+
+        # subscriber to pose array to get trajectory, drone_trajectory topic
+        self.create_subscription(PoseArray, '/drone_trajectory', self.drone_trajectory_callback, 10)
+
+        # publisher to publish markerarray to drone_marker_trajectory topic
+        self.drone_marker_trajectory_publisher = self.create_publisher(MarkerArray, 'drone_marker_trajectory', 10)
+
+        self.drone_path_publisher = self.create_publisher(Path, 'drone_path', 10)
 
         self.drone_marker_publisher = self.create_publisher(Marker, 'drone_marker', 10)
         self.create_subscription(Pose, '/simple_drone/gt_pose', self.drone_position_callback, 10)
@@ -71,29 +82,64 @@ class SDFToMarkerArray(Node):
         marker.scale.y = sy
         marker.scale.z = sz
         marker.color.a = 1.0
-        marker.color.r = 0.0
-        marker.color.g = 1.0
-        marker.color.b = 0.0
+        marker.color.r = 0.5
+        marker.color.g = 0.5
+        marker.color.b = 0.5
         return marker
-    
+
+    def drone_trajectory_callback(self, msg):
+        # convert to marker array
+        marker_array = MarkerArray()
+        for pose in msg.poses:
+            marker = Marker()
+            marker.header.frame_id = 'map'
+            marker.header.stamp = self.get_clock().now().to_msg()
+            marker.ns = 'drone_trajectory'
+            marker.id = msg.poses.index(pose)
+            marker.type = Marker.SPHERE
+            marker.action = Marker.ADD
+            marker.pose.position = pose.position
+            marker.pose.orientation = pose.orientation
+            marker.scale.x = 0.1
+            marker.scale.y = 0.1
+            marker.scale.z = 0.1
+            marker.color.a = 1.0
+            marker.color.r = 0.0
+            marker.color.g = 1.0
+            marker.color.b = 0.0
+            marker_array.markers.append(marker)
+        self.drone_marker_trajectory_publisher.publish(marker_array)
+
     def drone_position_callback(self, msg):
         marker = Marker()
         marker.header.frame_id = 'map'
         marker.header.stamp = self.get_clock().now().to_msg()
         marker.ns = 'drone'
         marker.id = 0
-        marker.type = Marker.CUBE
+        marker.type = Marker.MESH_RESOURCE
+        marker.mesh_resource = 'package://sjtu_drone_description/models/sjtu_drone/quadrotor_4.dae'
         marker.action = Marker.ADD
         marker.pose.position = msg.position
         marker.pose.orientation = msg.orientation
-        marker.scale.x = 0.3
-        marker.scale.y = 0.3
-        marker.scale.z = 0.3
+        marker.scale.x = 1.0
+        marker.scale.y = 1.0
+        marker.scale.z = 1.0
         marker.color.a = 1.0
         marker.color.r = 1.0
-        marker.color.g = 0.0
-        marker.color.b = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 1.0
         self.drone_marker_publisher.publish(marker)
+
+        # Update and publish path
+        pose_stamped = PoseStamped()
+        pose_stamped.header.frame_id = 'map'
+        pose_stamped.header.stamp = self.get_clock().now().to_msg()
+        pose_stamped.pose.position = msg.position
+        pose_stamped.pose.orientation = msg.orientation
+        self.drone_path.poses.append(pose_stamped)
+        self.drone_path.header.stamp = self.get_clock().now().to_msg()
+        self.drone_path_publisher.publish(self.drone_path)
+
 
 def main(args=None):
     rclpy.init(args=args)

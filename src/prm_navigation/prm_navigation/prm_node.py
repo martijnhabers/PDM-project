@@ -147,11 +147,11 @@ class PRMNode(Node):
             return
             
         #RRT:
-        """try:
+        try:
             self.rrt = RRT3D(current_pos_index, goal_pos_index, self.occupancy_grid, step_size=5, max_iter=1000)
             shortest_path_rrt = self.rrt.plan()
         except Exception as e:
-            self.get_logger().error(f'Failed to find RRT path: {e}')"""
+            self.get_logger().error(f'Failed to find RRT path: {e}')
     
         return shortest_path_prm
     

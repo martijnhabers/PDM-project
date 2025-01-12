@@ -11,6 +11,9 @@ Panels:
         - /Pose1/Topic1
         - /Marker1
         - /Marker1/Topic1
+        - /Path1
+        - /Path1/Status1
+        - /MarkerArray2
       Splitter Ratio: 0.5
     Tree Height: 787
   - Class: rviz_common/Selection
@@ -53,7 +56,7 @@ Visualization Manager:
       Axes Radius: 0.009999999776482582
       Class: rviz_default_plugins/PoseArray
       Color: 254; 17; 156
-      Enabled: true
+      Enabled: false
       Head Length: 0.20000000298023224
       Head Radius: 0.30000001192092896
       Name: PoseArray
@@ -67,7 +70,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /drone_trajectory
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/Map
       Color Scheme: map
@@ -134,6 +137,46 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /drone_marker
       Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 192; 97; 203
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /drone_path
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        drone_trajectory: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /drone_marker_trajectory
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -180,25 +223,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 14.528352737426758
+      Distance: 10.237459182739258
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.7796347141265869
-        Y: -7.613639831542969
-        Z: 3.642369508743286
+        X: 0.7113694548606873
+        Y: 0.6154089570045471
+        Z: 4.029721736907959
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8497966527938843
+      Pitch: 0.8947956562042236
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.027214527130127
+      Yaw: 2.149059295654297
     Saved: ~
 Window Geometry:
   Displays:
@@ -214,5 +257,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1864
-  X: 56
+  X: 57
   Y: 27
