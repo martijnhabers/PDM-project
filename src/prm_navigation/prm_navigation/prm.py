@@ -168,8 +168,8 @@ if __name__ == '__main__':
     bounds = [(0, 200), (0, 200)]
 
     # Start and goal points
-    start_point = (20, 20, 0)
-    goal_point = (160, 160, 0)
+    start_point = (25, 25, 0)
+    goal_point = (160, 180, 0)
 
     # Generate random grid with obstacles
     grid = generate_dummy_grid(bounds)
@@ -178,12 +178,12 @@ if __name__ == '__main__':
     print(os.getcwd())
 
     # import grid from csv file
-    grid, conversion_matrix = generate_ocupation_matrix("filled_world.world", z_layers = 2, debug=False)
+    grid, conversion_matrix = generate_ocupation_matrix("filled_world.world", z_layers = 3, debug=False)
     # invert the grid, 0 becomes 1, 1 becomes 0
     # grid = np.abs(grid - 1)
 
     # Create PRM object
-    prm = PRM(num_samples=150, k_neighbors=5, occupancy_grid=grid, conversion_matrix=conversion_matrix)
+    prm = PRM(num_samples=150, k_neighbors=15, occupancy_grid=grid, conversion_matrix=conversion_matrix)
     prm.build_roadmap(bounds)
     
     prm.export_to_file("graph.txt")

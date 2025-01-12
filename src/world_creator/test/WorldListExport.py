@@ -12,7 +12,7 @@ def generate_ocupation_matrix(world_file, z_layers = None, word_res = None, padd
     if padding is None:
         padding = 0.30
     if word_size is None:
-        word_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 3}
+        word_size= {"x_min": -10, "y_min": -10, "x_max": 10, "y_max": 10, "z_min": 0, "z_max": 5}
 
     ocupation_matrix = []
 
