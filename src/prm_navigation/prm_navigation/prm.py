@@ -8,6 +8,8 @@ import os
 import json
 import sys
 import math
+import time
+
 # 
 # sys.path.append(os.path.abspath("src/world_creator/test/"))
 
@@ -214,8 +216,17 @@ if __name__ == '__main__':
     # grid = np.abs(grid - 1)
 
     # Create PRM object
+
+    # start timer
+    start_time = time.time()
+
     prm = PRM(num_samples=150, k_neighbors=15, occupancy_grid=grid, conversion_matrix=conversion_matrix)
     prm.build_roadmap(bounds)
+
+    # end timer
+    end_time = time.time()
+
+    print("Time taken to build PRM: ", end_time - start_time)
     
     prm.export_to_file("graph")
 
