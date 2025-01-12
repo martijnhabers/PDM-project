@@ -74,7 +74,7 @@ class PRMNode(Node):
 
         self.goal_position = [msg.position.x, msg.position.y, msg.position.z]
         self.get_logger().info(f'Goal position set to {self.goal_position}')
-        shortest_path, path_type = self.find_path()
+        shortest_path = self.find_path()
 
         if not shortest_path:
             return
@@ -85,7 +85,7 @@ class PRMNode(Node):
         pose_array = PoseArray()
 
         # set the frame id
-        pose_array.header.frame_id = path_type
+        pose_array.header.frame_id = 'map'
 
         pose_array.header.stamp = self.get_clock().now().to_msg()
 
@@ -134,11 +134,11 @@ class PRMNode(Node):
         print("current_pos_index: ", np.round(current_pos_index).astype(int))
         print("goal_pos_index: ", np.round(goal_pos_index).astype(int))
 
-        # try:
-        shortest_path_prm = self.prm.find_path(np.round(current_pos_index).astype(int), np.round(goal_pos_index).astype(int))
-        # except Exception as e:
-            # self.get_logger().error(f'Failed to find path: {e}')
-            # return
+        try:
+            shortest_path_prm = self.prm.find_path(np.round(current_pos_index).astype(int), np.round(goal_pos_index).astype(int))
+        except Exception as e:
+            self.get_logger().error(f'Failed to find path: {e}')
+            return
             
         #RRT:
         """try:
@@ -147,7 +147,7 @@ class PRMNode(Node):
         except Exception as e:
             self.get_logger().error(f'Failed to find RRT path: {e}')"""
     
-        return shortest_path_prm, 'prm'
+        return shortest_path_prm
     
 
 def main(args=None):
