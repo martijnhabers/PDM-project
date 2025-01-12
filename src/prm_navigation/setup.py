@@ -10,8 +10,10 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name, ['prm_navigation/graph.txt']),
         ('share/' + package_name, ['prm_navigation/graph.gml']),
+        ('share/' + package_name, ['prm_navigation/graph.json']),
+        ('share/' + package_name, ['prm_navigation/occupancy_grid.csv']),
+        ('share/' + package_name + '/launch', ['prm_navigation/launch/prm.launch.py']),
 
     ],
     install_requires=['setuptools', 'networkx'],
@@ -24,6 +26,7 @@ setup(
     entry_points={
         'console_scripts': [
             'prm_node = prm_navigation.prm_node:main',
+            'visualization_node = prm_navigation.visualization_node:main',
         ],
     },
 )
