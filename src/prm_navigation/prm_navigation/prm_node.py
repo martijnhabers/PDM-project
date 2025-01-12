@@ -8,11 +8,17 @@ from prm_navigation.rrt import RRT3D
 from ament_index_python.packages import get_package_share_directory
 import numpy as np
 from random import randint
+import os
 
 class PRMNode(Node):
     def __init__(self):
         super().__init__('prm_node')
         self.declare_parameter('roadmap_file', 'graph.gml')
+
+        # wait for the occupancy grid to be created
+        while not os.path.exists('src/prm_navigation/prm_navigation/occupancy_grid.npy'):
+            pass
+
         roadmap_file = self.get_parameter('roadmap_file').get_parameter_value().string_value
         roadmap_file = get_package_share_directory('prm_navigation') + '/' + roadmap_file
 

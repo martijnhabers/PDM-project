@@ -189,37 +189,6 @@ def plot_prm(bounds, grid, prm, start_point, goal_point, shortest_path=None):
     #             plt.scatter(x, y, c='k', marker='o', s=10)
     plt.show()
 
-def plot_prm_3d_k3d(bounds, grid, prm, start_point, goal_point, shortest_path=None):
-    plot = k3d.plot()
-
-    # Plot the edges
-    for edge in prm.graph.edges:
-        node1 = prm.graph.nodes[edge[0]]['pos']
-        node2 = prm.graph.nodes[edge[1]]['pos']
-        line = k3d.line(np.array([node1, node2]), shader='simple', color=0x888888)
-        plot += line
-
-    # Plot the nodes
-    nodes = np.array([prm.graph.nodes[node]['pos'] for node in prm.graph.nodes])
-    points = k3d.points(nodes, point_size=0.1, color=0xff0000)
-    plot += points
-
-    # Plot the start and goal points
-    start_point = np.array([start_point])
-    goal_point = np.array([goal_point])
-    start = k3d.points(start_point, point_size=0.2, color=0x800080, label='Start')
-    goal = k3d.points(goal_point, point_size=0.2, color=0x00ff00, label='Goal')
-    plot += start
-    plot += goal
-
-    # Plot the shortest path if available
-    if shortest_path is not None:
-        path_coords = np.array([prm.graph.nodes[node]['pos'] for node in shortest_path])
-        path_line = k3d.line(path_coords, shader='simple', color=0x00ff00, width=0.1)
-        plot += path_line
-
-    plot.display()
-
 if __name__ == '__main__':
     print(os.getcwd())
     # Bounds of the environment
@@ -251,10 +220,10 @@ if __name__ == '__main__':
     prm.export_to_file("graph")
 
 
-    dummy_prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid, conversion_matrix=np.eye(4))
-    dummy_prm.graph = nx.read_gml(os.path.join(os.path.dirname(__file__), "graph" + ".gml"))
+    # dummy_prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid, conversion_matrix=np.eye(4))
+    # dummy_prm.graph = nx.read_gml(os.path.join(os.path.dirname(__file__), "graph" + ".gml"))
 
-    shortest_path = dummy_prm.find_path(start_point, goal_point)
+    # shortest_path = dummy_prm.find_path(start_point, goal_point)
     
 
     # # save shortest path to csv file, with x and y coordinates
@@ -274,9 +243,9 @@ if __name__ == '__main__':
     # shortest_path = None
     # shortest_path = prm.find_path(start_point, goal_point)
     
-    for i in shortest_path:
-        print(dummy_prm.graph.nodes[i]['pos'])
+    # for i in shortest_path:
+    #     print(dummy_prm.graph.nodes[i]['pos'])
 
     # plot_prm_3d_k3d(bounds, grid, dummy_prm, start_point, goal_point, shortest_path)
-    plot_prm(bounds, grid[0], dummy_prm, start_point, goal_point, shortest_path)
-    plot_prm(bounds, grid[1], dummy_prm, start_point, goal_point, shortest_path)
+    # plot_prm(bounds, grid[0], dummy_prm, start_point, goal_point, shortest_path)
+    # plot_prm(bounds, grid[1], dummy_prm, start_point, goal_point, shortest_path)
