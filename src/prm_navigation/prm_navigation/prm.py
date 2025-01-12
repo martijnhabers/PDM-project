@@ -3,6 +3,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
+import json
 import sys
 import math
 
@@ -20,7 +21,6 @@ class PRM:
         self.num_samples = num_samples
         self.k_neighbors = k_neighbors
         self.occupancy_grid = occupancy_grid
-        # self.graph = {"nodes": [], "edges": {}}  # Graph representation
         self.graph = nx.Graph()
         self.start, self.goal = None, None
         self.conversion_matrix = conversion_matrix
@@ -93,6 +93,9 @@ class PRM:
         if self.goal in self.graph.nodes:
             self.graph.remove_node(self.goal)
 
+        # TODO: Make it so that previously added start and goal nodes are not removed, instead making a more detailed graph
+
+
         # Add start and goal nodes to the graph, connect them to their nearest neighbors
         self.start, self.goal = max(self.graph.nodes) + 1, max(self.graph.nodes) + 2
         self.graph.add_node(self.start, pos=start)
@@ -120,11 +123,16 @@ class PRM:
         return np.all(np.array([self.occupancy_grid[layer, points[:, 0], points[:, 1]] == 0 for layer in layers]))
 
     def export_to_file(self, filename):
-        # Export graph to file
-        nx.write_weighted_edgelist(self.graph, filename)
-        # nx.write_gexf(self.graph, "graph.gexf")
-        nx.write_gml(self.graph, "graph.gml")
+
         
+
+        with open(os.path.join(os.path.dirname(__file__), filename + ".json"), "w", encoding='utf-8') as f:
+            json.dump(nx.cytoscape_data(self.graph), f, indent=4)
+        
+        nx.write_gml(self.graph, os.path.join(os.path.dirname(__file__), filename + ".gml"))
+        
+
+
 def generate_dummy_grid(bounds):
     grid = np.zeros((bounds[0][1], bounds[1][1]))
     # generate 6 obstacles that fall within the bounds
@@ -173,7 +181,7 @@ if __name__ == '__main__':
 
     # Generate random grid with obstacles
     grid = generate_dummy_grid(bounds)
-
+    
     # print current working directory
     print(os.getcwd())
 

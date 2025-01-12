@@ -14,13 +14,14 @@ def main():
         generate_world(
             max_objects=100,       # Max number of objects to try and place
             area_size=10,          # Size of the placement area (-10 to 10)
+            max_height=5.0,        # Maximum height for objects
             world_file=world_file
         )
     except Exception as e:
         print(f"Unexpected error: {e}")
 
 
-def generate_world(max_objects, area_size, world_file):
+def generate_world(max_objects, area_size, max_height, world_file):
     """Generate a Gazebo world with randomly placed objects."""
     placed_objects = []
     obstacles = []
@@ -32,11 +33,12 @@ def generate_world(max_objects, area_size, world_file):
             y = random.uniform(-area_size, area_size)
             size = random.uniform(0.5, 2.0)  # Object size (between 0.5m and 2m)
             shape = random.choice(["box", "cylinder"])
-            height = 3.0  # Set height to always be 3 meters
-            
-            if is_valid_position(x, y, size, placed_objects):
-                placed_objects.append({"x": x, "y": y, "size": size, "height": height})
-                obstacles.append(generate_obstacle(f"obstacle_{i}", x, y, size, shape, height))
+            height = random.uniform(1.0, 3.0)  # Vary the height of the objects
+            z = random.uniform(0, max_height - height)  # Ensure the object does not go below 0 or above max_height
+
+            if is_valid_position(x, y, z, size, placed_objects):
+                placed_objects.append({"x": x, "y": y, "z": z, "size": size, "height": height})
+                obstacles.append(generate_obstacle(f"obstacle_{i}", x, y, z, size, shape, height))
                 break
             
             attempts += 1
@@ -44,31 +46,34 @@ def generate_world(max_objects, area_size, world_file):
         if attempts == 100:
             print(f"Warning: Could not place object {i} after 100 attempts.")
 
-    # Write the world file
-    try:
-        with open(world_file, "w") as file:
-            file.write(generate_world_file_content(obstacles))
-        print(f"World file '{world_file}' generated successfully.")
-    except Exception as e:
-        print(f"Error writing world file: {e}")
+    save_world(obstacles, world_file)
 
 
-def generate_obstacle(name, x, y, size, shape, height):
-    """Generate the XML for a single obstacle."""
+def is_valid_position(x, y, z, size, placed_objects):
+    """Check if the position is valid (no overlap with existing objects)."""
+    for obj in placed_objects:
+        dist = math.sqrt((x - obj["x"])**2 + (y - obj["y"])**2 + (z - obj["z"])**2)
+        if dist < (size + obj["size"]):
+            return False
+    return True
+
+
+def generate_obstacle(name, x, y, z, size, shape, height):
+    """Generate the SDF XML for an obstacle."""
     if shape == "box":
         return f"""
-        <model name="{name}">
-            <static>true</static>  <!-- Make the object static -->
-            <pose>{x} {y} {height / 2} 0 0 0</pose>
-            <link name="link">
-                <collision name="collision">
+        <model name='{name}'>
+            <static>true</static>
+            <pose>{x} {y} {z} 0 0 0</pose>
+            <link name='link'>
+                <collision name='collision'>
                     <geometry>
                         <box>
                             <size>{size} {size} {height}</size>
                         </box>
                     </geometry>
                 </collision>
-                <visual name="visual">
+                <visual name='visual'>
                     <geometry>
                         <box>
                             <size>{size} {size} {height}</size>
@@ -80,11 +85,11 @@ def generate_obstacle(name, x, y, size, shape, height):
         """
     elif shape == "cylinder":
         return f"""
-        <model name="{name}">
-            <static>true</static>  <!-- Make the object static -->
-            <pose>{x} {y} {height / 2} 0 0 0</pose>
-            <link name="link">
-                <collision name="collision">
+        <model name='{name}'>
+            <static>true</static>
+            <pose>{x} {y} {z} 0 0 0</pose>
+            <link name='link'>
+                <collision name='collision'>
                     <geometry>
                         <cylinder>
                             <radius>{size / 2}</radius>
@@ -92,7 +97,7 @@ def generate_obstacle(name, x, y, size, shape, height):
                         </cylinder>
                     </geometry>
                 </collision>
-                <visual name="visual">
+                <visual name='visual'>
                     <geometry>
                         <cylinder>
                             <radius>{size / 2}</radius>
@@ -103,40 +108,26 @@ def generate_obstacle(name, x, y, size, shape, height):
             </link>
         </model>
         """
-    else:
-        print(f"Error: Unknown shape '{shape}'.")
-        return ""
 
 
-
-def is_valid_position(x, y, size, placed_objects):
-    """Check if the object can be placed at the given position without overlapping."""
-    for obj in placed_objects:
-        distance = math.sqrt((obj["x"] - x)**2 + (obj["y"] - y)**2)
-        if distance < (obj["size"] + size):  # Ensure no overlap
-            return False
-    return True
-
-
-def generate_world_file_content(obstacles):
-    """Generate the XML content for the world file, including a ground plane."""
-    ground_plane = """
-        <include>
-            <uri>model://ground_plane</uri>
-        </include>
-    """
-    return f"""
-    <sdf version="1.6">
-        <world name="default">
-            {ground_plane}
+def save_world(obstacles, world_file):
+    """Save the generated world to a file."""
+    world_template = f"""
+    <sdf version='1.6'>
+        <world name='default'>
+            <include>
+                <uri>model://ground_plane</uri>
+            </include>
+            <include>
+                <uri>model://sun</uri>
+            </include>
             {"".join(obstacles)}
         </world>
     </sdf>
     """
+    with open(world_file, 'w') as f:
+        f.write(world_template)
 
 
-
-# Parameters for the world
 if __name__ == "__main__":
     main()
-

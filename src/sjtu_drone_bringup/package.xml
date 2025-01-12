@@ -1,13 +1,20 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>prm_navigation</name>
+  <name>sjtu_drone_bringup</name>
   <version>0.0.0</version>
-  <description>This package uses PRM to determine a path between current and goal</description>
-  <maintainer email="martijn@habers.eu">Martijn Habers</maintainer>
+  <description>TODO: Package description</description>
+  <maintainer email="georg.novtony@aon.at">Georg Novotny</maintainer>
   <license>TODO: License declaration</license>
 
-  <exec_depend>networkx</exec_depend>
+  <depend>rclpy</depend>
+  <depend>xacro</depend>
+  <depend>rviz2</depend>
+  <depend>xterm</depend>
+  <depend>imu_tools</depend>
+  <depend>teleop_twist_keyboard</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>joint_state_publisher</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
