@@ -88,14 +88,28 @@ class SDFToMarkerArray(Node):
         return marker
 
     def drone_trajectory_callback(self, msg):
-        # convert to marker array
+        # Convert to marker array
         marker_array = MarkerArray()
-        for pose in msg.poses:
+        line_strip_marker = Marker()
+        line_strip_marker.header.frame_id = 'map'
+        line_strip_marker.header.stamp = self.get_clock().now().to_msg()
+        line_strip_marker.ns = 'drone_trajectory'
+        line_strip_marker.id = 0
+        line_strip_marker.type = Marker.LINE_STRIP
+        line_strip_marker.action = Marker.ADD
+        line_strip_marker.scale.x = 0.05  # Line width
+        line_strip_marker.color.a = 0.35    
+        line_strip_marker.color.r = 0.0
+        line_strip_marker.color.g = 1.0
+        line_strip_marker.color.b = 0.0
+
+        for i, pose in enumerate(msg.poses):
+            # Create sphere markers
             marker = Marker()
             marker.header.frame_id = 'map'
             marker.header.stamp = self.get_clock().now().to_msg()
             marker.ns = 'drone_trajectory'
-            marker.id = msg.poses.index(pose)
+            marker.id = i + 1  # Ensure unique IDs for each marker
             marker.type = Marker.SPHERE
             marker.action = Marker.ADD
             marker.pose.position = pose.position
@@ -108,6 +122,18 @@ class SDFToMarkerArray(Node):
             marker.color.g = 1.0
             marker.color.b = 0.0
             marker_array.markers.append(marker)
+
+            # Add points to the line strip marker
+            point = Point()
+            point.x = pose.position.x
+            point.y = pose.position.y
+            point.z = pose.position.z
+            line_strip_marker.points.append(point)
+
+        # Add the line strip marker to the marker array
+        marker_array.markers.append(line_strip_marker)
+
+        # Publish the marker array
         self.drone_marker_trajectory_publisher.publish(marker_array)
 
     def drone_position_callback(self, msg):
