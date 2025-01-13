@@ -18,9 +18,13 @@ class SDFToMarkerArray(Node):
 
         # subscriber to pose array to get trajectory, drone_trajectory topic
         self.create_subscription(PoseArray, '/drone_trajectory', self.drone_trajectory_callback, 10)
+        self.create_subscription(PoseArray, '/rrt_drone_trajectory', self.rrt_trajectory_callback, 10)
+
 
         # publisher to publish markerarray to drone_marker_trajectory topic
         self.drone_marker_trajectory_publisher = self.create_publisher(MarkerArray, 'drone_marker_trajectory', 10)
+
+        self.rrt_marker_trajectory_publisher = self.create_publisher(MarkerArray, 'rrt_marker_trajectory', 10)
 
         self.drone_path_publisher = self.create_publisher(Path, 'drone_path', 10)
 
@@ -135,6 +139,55 @@ class SDFToMarkerArray(Node):
 
         # Publish the marker array
         self.drone_marker_trajectory_publisher.publish(marker_array)
+
+    def rrt_trajectory_callback(self, msg):
+        # Convert to marker array
+        marker_array = MarkerArray()
+        line_strip_marker = Marker()
+        line_strip_marker.header.frame_id = 'map'
+        line_strip_marker.header.stamp = self.get_clock().now().to_msg()
+        line_strip_marker.ns = 'rrt_trajectory'
+        line_strip_marker.id = 0
+        line_strip_marker.type = Marker.LINE_STRIP
+        line_strip_marker.action = Marker.ADD
+        line_strip_marker.scale.x = 0.05
+        line_strip_marker.color.a = 0.35
+        line_strip_marker.color.r = 1.0
+        line_strip_marker.color.g = 0.0
+        line_strip_marker.color.b = 1.0
+
+        for i, pose in enumerate(msg.poses):
+            # Create sphere markers
+            marker = Marker()
+            marker.header.frame_id = 'map'
+            marker.header.stamp = self.get_clock().now().to_msg()
+            marker.ns = 'rrt_trajectory'
+            marker.id = i + 1
+            marker.type = Marker.SPHERE
+            marker.action = Marker.ADD
+            marker.pose.position = pose.position
+            marker.pose.orientation = pose.orientation
+            marker.scale.x = 0.1
+            marker.scale.y = 0.1
+            marker.scale.z = 0.1
+            marker.color.a = 1.0
+            marker.color.r = 1.0
+            marker.color.g = 0.0
+            marker.color.b = 1.0
+            marker_array.markers.append(marker)
+
+            # Add points to the line strip marker
+            point = Point()
+            point.x = pose.position.x
+            point.y = pose.position.y
+            point.z = pose.position.z
+            line_strip_marker.points.append(point)
+        
+        # Add the line strip marker to the marker array
+        marker_array.markers.append(line_strip_marker)
+
+        # Publish the marker array
+        self.rrt_marker_trajectory_publisher.publish(marker_array)
 
     def drone_position_callback(self, msg):
         marker = Marker()

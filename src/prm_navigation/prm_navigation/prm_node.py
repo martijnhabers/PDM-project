@@ -9,6 +9,7 @@ from ament_index_python.packages import get_package_share_directory
 import numpy as np
 from random import randint
 import os
+import time
 
 class PRMNode(Node):
     def __init__(self):
@@ -27,10 +28,10 @@ class PRMNode(Node):
         self.roadmap = nx.read_gml(roadmap_file)
 
         # Create a PRM object with the loaded graph
-        grid = np.load('src/prm_navigation/prm_navigation/occupancy_grid.npy')
+        self.grid = np.load('src/prm_navigation/prm_navigation/occupancy_grid.npy')
         conversion_matrix = np.load('src/prm_navigation/prm_navigation/conversion_matrix.npy')
 
-        self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid, conversion_matrix=conversion_matrix)
+        self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=self.grid, conversion_matrix=conversion_matrix)
         self.prm.graph = self.roadmap
 
         self.current_position = None
@@ -49,6 +50,8 @@ class PRMNode(Node):
 
         # create publisher for desired trajectory, posearray
         self.trajectory_publisher = self.create_publisher(PoseArray, '/drone_trajectory', 10)
+
+        self.rrt_trajectory_publisher = self.create_publisher(PoseArray, '/rrt_drone_trajectory', 10)
 
         self.get_logger().info('PRM Node has been started.')
 
@@ -80,37 +83,60 @@ class PRMNode(Node):
 
         self.goal_position = [msg.position.x, msg.position.y, msg.position.z]
         self.get_logger().info(f'Goal position set to {self.goal_position}')
-        shortest_path = self.find_path()
+        shortest_path_prm, shortest_path_rrt = self.find_path()
 
-        if not shortest_path:
-            return
-        
-        self.get_logger().info('Path found')
-        
-        # create PoseArray message to publish the trajectory
-        pose_array = PoseArray()
-
-        # set the frame id
-        pose_array.header.frame_id = 'map'
-
-        pose_array.header.stamp = self.get_clock().now().to_msg()
-
-        for node in shortest_path:
-            pose = Pose()
-            point_idx = np.array(self.roadmap.nodes[node]['pos'])
-            point_idx = np.append(point_idx, 1.0)
-
-            point_coord = np.dot(self.prm.conversion_matrix, point_idx)
+        if shortest_path_prm:
+            self.get_logger().info('PRM Path found')
             
-            print("point_coord: ", point_coord)
+            # create PoseArray message to publish the trajectory
+            pose_array = PoseArray()
 
-            pose.position = Point(x = float(point_coord[0]),
-                                  y = float(point_coord[1]),
-                                  z = float(point_coord[2]))
-            
-            pose_array.poses.append(pose)
+            # set the frame id
+            pose_array.header.frame_id = 'map'
 
-        self.trajectory_publisher.publish(pose_array)
+            pose_array.header.stamp = self.get_clock().now().to_msg()
+
+            for node in shortest_path_prm:
+                pose = Pose()
+                point_idx = np.array(self.roadmap.nodes[node]['pos'])
+                point_idx = np.append(point_idx, 1.0)
+
+                point_coord = np.dot(self.prm.conversion_matrix, point_idx)
+                
+                print("point_coord: ", point_coord)
+
+                pose.position = Point(x = float(point_coord[0]),
+                                    y = float(point_coord[1]),
+                                    z = float(point_coord[2]))
+                
+                pose_array.poses.append(pose)
+
+            self.trajectory_publisher.publish(pose_array)
+
+        if shortest_path_rrt:
+            self.get_logger().info('RRT Path found')
+            pose_array_rrt = PoseArray()
+
+            for node in shortest_path_rrt:
+                pose = Pose()
+                point_idx = np.array([node['x'], node['y'], node['z'], 1.0])
+                # point_idx = np.append(point_idx, 1.0)
+
+                point_coord = np.dot(self.prm.conversion_matrix, point_idx)
+                
+                print("point_coord: ", point_coord)
+
+                pose.position = Point(x = float(point_coord[0]),
+                                    y = float(point_coord[1]),
+                                    z = float(point_coord[2]))
+                
+                pose_array_rrt.poses.append(pose)
+            self.rrt_trajectory_publisher.publish(pose_array_rrt)
+        if not shortest_path_prm:
+            self.get_logger().info('No PRM path found')
+        if not shortest_path_rrt:
+            self.get_logger().info('No RRT path found')
+        return
 
     def clamp(self, n):
         for i, val in enumerate(n):
@@ -141,19 +167,26 @@ class PRMNode(Node):
         print("goal_pos_index: ", np.round(goal_pos_index).astype(int))
 
         try:
+            prm_time = time.time()
             shortest_path_prm = self.prm.find_path(np.round(current_pos_index).astype(int), np.round(goal_pos_index).astype(int))
+            prm_end_time = time.time()
+            self.get_logger().info(f'PRM path planning took {prm_end_time - prm_time} seconds')
         except Exception as e:
             self.get_logger().error(f'Failed to find path: {e}')
             return
             
         #RRT:
         try:
-            self.rrt = RRT3D(current_pos_index, goal_pos_index, self.occupancy_grid, step_size=5, max_iter=1000)
+            rrt_start_time = time.time()
+            self.rrt = RRT3D(current_pos_index, goal_pos_index, self.grid, step_size=5, max_iter=5000)
             shortest_path_rrt = self.rrt.plan()
+            rrt_end_time = time.time()
+            self.get_logger().info(f'RRT path planning took {rrt_end_time - rrt_start_time} seconds')
+            # self.get_logger().warn(("shortest_path_rrt: " + str(shortest_path_rrt)))
         except Exception as e:
             self.get_logger().error(f'Failed to find RRT path: {e}')
     
-        return shortest_path_prm
+        return shortest_path_prm, shortest_path_rrt
     
 
 def main(args=None):

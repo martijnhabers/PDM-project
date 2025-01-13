@@ -220,7 +220,7 @@ if __name__ == '__main__':
     # start timer
     start_time = time.time()
 
-    prm = PRM(num_samples=150, k_neighbors=15, occupancy_grid=grid, conversion_matrix=conversion_matrix)
+    prm = PRM(num_samples=150, k_neighbors=10, occupancy_grid=grid, conversion_matrix=conversion_matrix)
     prm.build_roadmap(bounds)
 
     # end timer
