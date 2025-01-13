@@ -4,6 +4,20 @@ Welcome to the PDM Project Group 38
 
 *Contributors: Chiel de Dood (4915607), Alexandre Ferreira (6282598), Martijn Habers (5064767), and Jason Kim (6163246)*
 
+This project focuses on designing a motion
+planning framework for drone navigation in static
+environments for warehouse sites. The goal is to
+ensure collision-free path planning for surveillance and
+infrastructure inspection. The Probabilistic Roadmap
+(PRM) algorithm is selected due to its scalability and
+efficiency in multi-query and high-dimensional spaces
+given the scenario. By extracting a top-view 2D and
+3D occupancy map from a 3D Gazebo simulation
+environment and computing on 2D and 3D digital twin,
+our method provides offline collision-free path planning
+system.
+
+By clicking on the image below, you can watch a video of the project in action.
 <!-- embed youtube video -->
 [![PDM Project Video](thumbnail.png)](https://www.youtube.com/embed/YocB6JYRgxA?si=X_jh2rqlZUxvwJ2J)
 
@@ -17,6 +31,14 @@ Welcome to the PDM Project Group 38
   - [sjtu_drone_description](#sjtu_drone_description)
   - [world_creator](#world_creator)
   - [filled_world.world](#filled_worldworld)
+- [Pre-requisites](#pre-requisites)
+- [Usage](#usage)
+  - [1. Clone the repository](#1-clone-the-repository-to-your-local-machine)
+  - [2. Build the workspace](#2-build-the-workspace)
+  - [3. Prepare the environment](#3-prepare-the-environment)
+  - [4. Launch the simulation](#4-launch-the-simulation)
+  - [5. Control the drone](#5-control-the-drone)
+  
 
 ## Overview
 
