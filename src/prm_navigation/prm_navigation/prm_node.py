@@ -8,11 +8,18 @@ from prm_navigation.rrt import RRT3D
 from ament_index_python.packages import get_package_share_directory
 import numpy as np
 from random import randint
+import os
+import time
 
 class PRMNode(Node):
     def __init__(self):
         super().__init__('prm_node')
         self.declare_parameter('roadmap_file', 'graph.gml')
+
+        # wait for the occupancy grid to be created
+        while not os.path.exists('src/prm_navigation/prm_navigation/occupancy_grid.npy'):
+            pass
+
         roadmap_file = self.get_parameter('roadmap_file').get_parameter_value().string_value
         roadmap_file = get_package_share_directory('prm_navigation') + '/' + roadmap_file
 
@@ -21,9 +28,10 @@ class PRMNode(Node):
         self.roadmap = nx.read_gml(roadmap_file)
 
         # Create a PRM object with the loaded graph
-        grid = np.loadtxt('src/prm_navigation/prm_navigation/occupancy_grid.csv', delimiter=',')
+        self.grid = np.load('src/prm_navigation/prm_navigation/occupancy_grid.npy')
+        conversion_matrix = np.load('src/prm_navigation/prm_navigation/conversion_matrix.npy')
 
-        self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=grid)
+        self.prm = PRM(num_samples=0, k_neighbors=15, occupancy_grid=self.grid, conversion_matrix=conversion_matrix)
         self.prm.graph = self.roadmap
 
         self.current_position = None
@@ -37,11 +45,13 @@ class PRMNode(Node):
         self.occupancy_grid_publisher = self.create_publisher(OccupancyGrid, '/occupancy_grid', 10)
 
         # format the grid to be published
-        self.publish_occupancy_grid(grid)
+        # self.publish_occupancy_grid(grid)
 
 
         # create publisher for desired trajectory, posearray
         self.trajectory_publisher = self.create_publisher(PoseArray, '/drone_trajectory', 10)
+
+        self.rrt_trajectory_publisher = self.create_publisher(PoseArray, '/rrt_drone_trajectory', 10)
 
         self.get_logger().info('PRM Node has been started.')
 
@@ -63,7 +73,7 @@ class PRMNode(Node):
         self.occupancy_grid_publisher.publish(occupancygrid_msg)
 
     def current_position_callback(self, msg):
-        self.current_position = [msg.position.x, msg.position.y]
+        self.current_position = [msg.position.x, msg.position.y, msg.position.z]
         self.get_logger().info(f'Current position set to {self.current_position}', throttle_duration_sec = 2)
     
     def goal_position_callback(self, msg):
@@ -71,64 +81,112 @@ class PRMNode(Node):
             return
         self.msg_previous = msg
 
-        self.goal_position = [msg.position.x, msg.position.y]
+        self.goal_position = [msg.position.x, msg.position.y, msg.position.z]
         self.get_logger().info(f'Goal position set to {self.goal_position}')
-        shortest_path, path_type = self.find_path()
+        shortest_path_prm, shortest_path_rrt = self.find_path()
 
-        if not shortest_path:
-            return
-        
-        self.get_logger().info('Path found')
-        
-        # create PoseArray message to publish the trajectory
-        pose_array = PoseArray()
+        if shortest_path_prm:
+            self.get_logger().info('PRM Path found')
+            
+            # create PoseArray message to publish the trajectory
+            pose_array = PoseArray()
 
-        # set the frame id
-        pose_array.header.frame_id = path_type
+            # set the frame id
+            pose_array.header.frame_id = 'map'
 
-        pose_array.header.stamp = self.get_clock().now().to_msg()
+            pose_array.header.stamp = self.get_clock().now().to_msg()
 
-        for node in shortest_path:
-            pose = Pose()
-            pose.position = Point(x = float(self.roadmap.nodes[node]['pos'][0])/10-10, y = float(self.roadmap.nodes[node]['pos'][1])/10-10, z = 2.0)
-            # # set orientation towards the next node
-            # # not necessary, only nice for visualization
-            # if node < shortest_path[-1]:
-            #     next_node = shortest_path[shortest_path.index(node) + 1]
-            #     next_node_pos = self.roadmap.nodes[next_node]['pos']
-            #     dx = next_node_pos[0] - self.roadmap.nodes[node]['pos'][0]
-            #     dy = next_node_pos[1] - self.roadmap.nodes[node]['pos'][1]
-            #     yaw = np.arctan2(dy, dx)
-            #     pose.orientation.z = np.sin(yaw/2)
-            #     pose.orientation.w = np.cos(yaw/2)
-            pose_array.poses.append(pose)
+            for node in shortest_path_prm:
+                pose = Pose()
+                point_idx = np.array(self.roadmap.nodes[node]['pos'])
+                point_idx = np.append(point_idx, 1.0)
 
-        self.trajectory_publisher.publish(pose_array)
+                point_coord = np.dot(self.prm.conversion_matrix, point_idx)
+                
+                print("point_coord: ", point_coord)
 
-        
+                pose.position = Point(x = float(point_coord[0]),
+                                    y = float(point_coord[1]),
+                                    z = float(point_coord[2]))
+                
+                pose_array.poses.append(pose)
+
+            self.trajectory_publisher.publish(pose_array)
+
+        if shortest_path_rrt:
+            self.get_logger().info('RRT Path found')
+            pose_array_rrt = PoseArray()
+
+            for node in shortest_path_rrt:
+                pose = Pose()
+                point_idx = np.array([node['x'], node['y'], node['z'], 1.0])
+                # point_idx = np.append(point_idx, 1.0)
+
+                point_coord = np.dot(self.prm.conversion_matrix, point_idx)
+                
+                print("point_coord: ", point_coord)
+
+                pose.position = Point(x = float(point_coord[0]),
+                                    y = float(point_coord[1]),
+                                    z = float(point_coord[2]))
+                
+                pose_array_rrt.poses.append(pose)
+            self.rrt_trajectory_publisher.publish(pose_array_rrt)
+        if not shortest_path_prm:
+            self.get_logger().info('No PRM path found')
+        if not shortest_path_rrt:
+            self.get_logger().info('No RRT path found')
+        return
+
+    def clamp(self, n):
+        for i, val in enumerate(n):
+            if i == 2:
+                n[i] = max(0, min(val, 3))
+            else:
+                n[i] = max(0, min(val, 199))
+        return n
 
     def find_path(self):
         if self.current_position is None or self.goal_position is None:
             self.get_logger().warn('Current or goal position not set.')
             return
 
-        # Find shortest path
-        current_pos_index =  [(x + 10) * 10 for x in self.current_position]
-        goal_pos_index = [(x + 10) * 10 for x in self.goal_position]
+        current_pos = np.array(self.current_position)
+        current_pos = np.append(current_pos, 1.0)
+
+        current_pos_index = np.dot(np.linalg.inv(self.prm.conversion_matrix), current_pos)[:3].astype(int)
+        current_pos_index = self.clamp(current_pos_index)
+
+        goal_pos = np.array(self.goal_position)
+        goal_pos = np.append(goal_pos, 1.0)
+
+        goal_pos_index = np.dot(np.linalg.inv(self.prm.conversion_matrix), goal_pos)[:3].astype(int)
+        goal_pos_index = self.clamp(goal_pos_index)
+
+        print("current_pos_index: ", np.round(current_pos_index).astype(int))
+        print("goal_pos_index: ", np.round(goal_pos_index).astype(int))
 
         try:
-            shortest_path_prm = self.prm.find_path(current_pos_index, goal_pos_index)
+            prm_time = time.time()
+            shortest_path_prm = self.prm.find_path(np.round(current_pos_index).astype(int), np.round(goal_pos_index).astype(int))
+            prm_end_time = time.time()
+            self.get_logger().info(f'PRM path planning took {prm_end_time - prm_time} seconds')
         except Exception as e:
             self.get_logger().error(f'Failed to find path: {e}')
+            return
             
         #RRT:
-        """try:
-            self.rrt = RRT3D(current_pos_index, goal_pos_index, self.occupancy_grid, step_size=5, max_iter=1000)
+        try:
+            rrt_start_time = time.time()
+            self.rrt = RRT3D(current_pos_index, goal_pos_index, self.grid, step_size=5, max_iter=5000)
             shortest_path_rrt = self.rrt.plan()
+            rrt_end_time = time.time()
+            self.get_logger().info(f'RRT path planning took {rrt_end_time - rrt_start_time} seconds')
+            # self.get_logger().warn(("shortest_path_rrt: " + str(shortest_path_rrt)))
         except Exception as e:
-            self.get_logger().error(f'Failed to find RRT path: {e}')"""
+            self.get_logger().error(f'Failed to find RRT path: {e}')
     
-        return shortest_path_prm, 'prm'
+        return shortest_path_prm, shortest_path_rrt
     
 
 def main(args=None):

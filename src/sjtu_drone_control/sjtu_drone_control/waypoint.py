@@ -227,7 +227,7 @@ class PositionMetrics():
         
 
         array = np.array(self.positions)
-        np.save(name, array)
+        #np.save(name, array)
 
         self.make_plot(array)
         self.parent.get_logger().info(f"Positions saved to {name}")
@@ -249,7 +249,7 @@ class PositionMetrics():
 
         with open(csv_name, 'a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([self.parent.waypoints[0]['x'], self.parent.waypoints[0]['y'], self.parent.waypoints[-1]['x'], self.parent.waypoints[-1]['y'], self.parent.path_type, distance_travelled, time_taken])
+            writer.writerow([self.parent.waypoints[0]['x'], self.parent.waypoints[0]['y'], self.parent.waypoints[0]['z'], self.parent.waypoints[-1]['x'], self.parent.waypoints[-1]['y'], self.parent.waypoints[-1]['z'], distance_travelled, time_taken])
             self.parent.get_logger().info(f"Metrics saved: distance_travelled={distance_travelled:.2f}, time_taken={time_taken:.2f}")
         return
     

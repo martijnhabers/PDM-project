@@ -28,7 +28,7 @@ import xacro
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time", default="true")
-    use_gui = DeclareLaunchArgument("use_gui", default_value="true", choices=["true", "false"],
+    use_gui = DeclareLaunchArgument("use_gui", default_value="false", choices=["true", "false"],
                                     description="Whether to execute gzclient")
     xacro_file_name = "sjtu_drone.urdf.xacro"
     pkg_gazebo_ros = get_package_share_directory('gazebo_ros')

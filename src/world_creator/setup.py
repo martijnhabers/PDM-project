@@ -10,6 +10,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/test', ['test/WorldListExport.py']),  # Ensure the file is copied to the correct directory
     ],
     install_requires=['setuptools'],
     zip_safe=True,
