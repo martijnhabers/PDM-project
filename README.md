@@ -59,13 +59,13 @@ You must have the following installed on your system to run the simulation:
 
 To run the simulation, follow these steps:
 
-1. Clone the repository to your local machine:
+### 1. Clone the repository to your local machine:
 
 ```
 git clone git@github.com:martijnhabers/PDM-project.git
 ```
 
-2. Build the workspace:
+### 2. Build the workspace:
 
 ```
 cd PDM-project
@@ -73,7 +73,7 @@ colcon build
 source install/setup.bash
 ```
 
-3. Prepare the environment:
+### 3. Prepare the environment:
 
 Before running the simulation you must first generate the world's environment for gazebo. To do this, run the following command:
 
@@ -93,7 +93,7 @@ Next, generate the PRM path planning graph (offline):
 python3 src/prm_navigation/prm_navigation/prm.py
 ```
 
-4. Launch the simulation:
+### 4. Launch the simulation:
 
 First launch RViz:
 
@@ -113,7 +113,7 @@ Run the following command to start the drone simulation:
 ros2 launch sjtu_drone_control drone_control_launch.py
 ```
 
-5. Control the drone:
+### 5. Control the drone:
 
 Now you must give the drone a goal in 3D space to navigate to based on its current position. You can do this by publishing a Pose message to the 'goal_position' topic. For example:
 
