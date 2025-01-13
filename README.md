@@ -1,5 +1,7 @@
 # PDM Project
 
+> DISCLAIMER: This repository has been set to public for the project deadline, once graded it will be set back to private.
+
 Welcome to the PDM Project Group 38
 
 *Contributors: Chiel de Dood (4915607), Alexandre Ferreira (6282598), Martijn Habers (5064767), and Jason Kim (6163246)*
