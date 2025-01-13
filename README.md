@@ -5,7 +5,7 @@ Welcome to the PDM Project Group 38
 *Contributors: Chiel de Dood (4915607), Alexandre Ferreira (6282598), Martijn Habers (5064767), and Jason Kim (6163246)*
 
 <!-- embed youtube video -->
-[![PDM Project Video](thumbnail.png)(https://www.youtube.com/embed/YocB6JYRgxA?si=X_jh2rqlZUxvwJ2J)]
+[![PDM Project Video](thumbnail.png)](https://www.youtube.com/embed/YocB6JYRgxA?si=X_jh2rqlZUxvwJ2J)
 
 ## Table of Contents
 
